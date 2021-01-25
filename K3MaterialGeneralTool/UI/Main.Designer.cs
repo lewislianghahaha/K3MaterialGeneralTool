@@ -1,4 +1,4 @@
-﻿namespace K3MaterialGeneralTool
+﻿namespace K3MaterialGeneralTool.UI
 {
     partial class Main
     {
