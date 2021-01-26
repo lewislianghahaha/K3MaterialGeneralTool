@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace BomOfferOrder.UI
+namespace K3MaterialGeneralTool.UI
 {
     public partial class Load : Form
     {

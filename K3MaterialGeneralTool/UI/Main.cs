@@ -25,5 +25,7 @@ namespace K3MaterialGeneralTool.UI
             //设置TabControl控件默认显示页
             tbhistory.SelectedIndex = 1;
         }
+
+
     }
 }

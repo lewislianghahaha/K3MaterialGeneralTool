@@ -1,6 +1,6 @@
 ﻿using System.Configuration;
 
-namespace BomOfferOrder
+namespace K3MaterialGeneralTool
 {
     public class Conn
     {
@@ -21,8 +21,8 @@ namespace BomOfferOrder
             }
             else
             {
-                //读取App.Config配置文件中的Connstring节点    
-                var pubs = ConfigurationManager.ConnectionStrings["ConnstringBom"];
+                //读取App.Config配置文件中的ConnstringMaterial节点    
+                var pubs = ConfigurationManager.ConnectionStrings["ConnstringMaterial"];
                 strcon = pubs.ConnectionString;
             }
 

@@ -1,4 +1,4 @@
-﻿namespace BomOfferOrder.UI
+﻿namespace K3MaterialGeneralTool.UI
 {
     partial class Load
     {

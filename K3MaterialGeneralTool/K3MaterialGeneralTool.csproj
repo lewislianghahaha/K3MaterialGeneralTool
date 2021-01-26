@@ -33,6 +33,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\三华_DE值计算工具_20200619\Code\DeValueGenerateTool\DeValueGenerateTool\DLL\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=2.3.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\三华_DE值计算工具_20200619\Code\DeValueGenerateTool\DeValueGenerateTool\DLL\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML, Version=2.3.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\三华_DE值计算工具_20200619\Code\DeValueGenerateTool\DeValueGenerateTool\DLL\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net, Version=2.3.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\三华_DE值计算工具_20200619\Code\DeValueGenerateTool\DeValueGenerateTool\DLL\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats, Version=2.3.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\三华_DE值计算工具_20200619\Code\DeValueGenerateTool\DeValueGenerateTool\DLL\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -49,6 +69,11 @@
   <ItemGroup>
     <Compile Include="Conn.cs" />
     <Compile Include="DB\SqlList.cs" />
+    <Compile Include="DB\TempDtList.cs" />
+    <Compile Include="Task\ConDb.cs" />
+    <Compile Include="Task\GenerateDt.cs" />
+    <Compile Include="Task\ImportDt.cs" />
+    <Compile Include="Task\SearchDB.cs" />
     <Compile Include="Task\TaskLogic.cs" />
     <Compile Include="UI\BinColFrm.cs">
       <SubType>Form</SubType>
@@ -120,11 +145,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\Debug\K3MaterialGeneralTool.vshost.exe" />
+    <Content Include="DLL\ICSharpCode.SharpZipLib.dll" />
+    <Content Include="DLL\NPOI.dll" />
+    <Content Include="DLL\NPOI.OOXML.dll" />
+    <Content Include="DLL\NPOI.OpenXml4Net.dll" />
+    <Content Include="DLL\NPOI.OpenXmlFormats.dll" />
     <Content Include="obj\Debug\K3MaterialGeneralTool.csproj.FileListAbsolute.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Release\" />
-    <Folder Include="DLL\" />
     <Folder Include="obj\Debug\TempPE\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
