@@ -1,6 +1,4 @@
-﻿using NPOI.Util;
-
-namespace K3MaterialGeneralTool.DB
+﻿namespace K3MaterialGeneralTool.DB
 {
     public class SqlList
     {
@@ -16,7 +14,7 @@ namespace K3MaterialGeneralTool.DB
         public string Get_SearchBindExcelCol()
         {
             _result = @"
-                          SELECT A.ExcelCol,A.ExcelColDataType,A.Bindid,A.CreateDt
+                          SELECT A.ExcelColId,A.ExcelCol 名称,A.ExcelColDataType 数据类型
                           FROM dbo.T_MAT_BindExcelCol A
                           WHERE A.Bindid=1
                        ";
@@ -24,18 +22,19 @@ namespace K3MaterialGeneralTool.DB
         }
 
         /// <summary>
-        /// K3字段绑定记录(更新时使用)
+        /// K3字段绑定记录(在'绑定'功能显示及更新时使用)
         /// </summary>
         /// <returns></returns>
-        public string Get_SearchBindK3Col()
+        public string Get_SearchBindK3Col(int typeid)
         {
-            _result = @"
-                           SELECT A.Typeid,A.K3ColId,A.K3ColTableName,A.K3ColName,A.K3ColDataType,A.Bindid,A.CreateDt 
+            _result = $@"
+                           SELECT A.K3ColId,A.K3Col,A.K3ColTableName,A.K3ColName 名称,A.K3ColDataType 数据类型
                            FROM dbo.T_MAT_BindK3Col A
                            WHERE A.Bindid=1
+                           AND A.Typeid='{typeid}'
                            ORDER BY A.Typeid
                        ";
-            return _result;   
+            return _result;
         }
 
         /// <summary>
@@ -90,13 +89,10 @@ namespace K3MaterialGeneralTool.DB
         #region 基础数据相关
 
         /// <summary>
-        /// 获取K3-‘物料’各下拉列表记录(生成新物料时使用)
+        /// 获取K3-‘物料’各下拉列表记录(初始化基础数据源时使用)
         /// </summary>
-        /// <param name="typeid">类型ID,(0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
-                                     ///13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位)</param>
-        /// <param name="fname">名称</param>
         /// <returns></returns>
-        public string Get_SearchSourceRecord(int typeid,string fname)
+        public string Get_SearchK3SourceRecord()
         {
             _result = $@"
                             SELECT X.ID
@@ -297,8 +293,42 @@ namespace K3MaterialGeneralTool.DB
                             --ORDER BY A.FNUMBER
 
                             )X
-                            WHERE X.TYPEID='{typeid}'
-                            AND X.NAME='{fname}'
+                        ";
+            return _result;
+        }
+
+        /// <summary>
+        /// 获取原漆K3记录(创建新物料时使用)
+        /// </summary>
+        /// <param name="fname"></param>
+        /// <returns></returns>
+        public string Get_SearchK3BinRecord(string fname)
+        {
+            _result = $@"
+                            SELECT A.FMATERIALID
+                            FROM dbo.T_BD_MATERIAL A
+                            INNER JOIN dbo.T_BD_MATERIAL_L B ON A.FMATERIALID=B.FMATERIALID AND B.FLOCALEID=2052
+                            WHERE A.F_YTC_ASSISTANT5 IN('571f36aa14afdc','571f36b714afde')     --571f36aa14afdc(原漆半成品) 571f36b714afde(原漆)
+                            AND A.FDOCUMENTSTATUS='C'
+                            WHERE B.FNAME='{fname}'
+                        ";
+            return _result;
+        }
+
+        /// <summary>
+        /// 获取基础资料数据源(创建新物料时使用)
+        /// </summary>
+        /// <param name="typeid">类型ID,(0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
+                                      ///13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位)</param>
+        /// <param name="fname">名称</param>
+        /// <returns></returns>
+        public string Get_SearchSourceRecord(int typeid, string fname)
+        {
+            _result = $@"
+                            SELECT A.Id 
+                            FROM dbo.T_MAT_Source A
+                            WHERE A.Typeid='{typeid}'
+                            AND A.FName='{fname}'
                         ";
             return _result;
         }

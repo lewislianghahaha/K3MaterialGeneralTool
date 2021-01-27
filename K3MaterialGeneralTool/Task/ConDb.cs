@@ -10,8 +10,8 @@ namespace K3MaterialGeneralTool.Task
         /// <returns></returns>
         public SqlConnection GetK3CloudConn()
         {
-            var conn=new Conn();
-            var sqlcon=new SqlConnection(conn.GetConnectionString(0));
+            var conn = new Conn();
+            var sqlcon = new SqlConnection(conn.GetConnectionString(0));
             return sqlcon;
         }
 
@@ -22,7 +22,7 @@ namespace K3MaterialGeneralTool.Task
         public SqlConnection GetMaterialConn()
         {
             var conn = new Conn();
-            var sqlcon=new SqlConnection(conn.GetConnectionString(1));
+            var sqlcon = new SqlConnection(conn.GetConnectionString(1));
             return sqlcon;
         }
     }

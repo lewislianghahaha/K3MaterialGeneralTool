@@ -71,10 +71,12 @@
     <Compile Include="DB\SqlList.cs" />
     <Compile Include="DB\TempDtList.cs" />
     <Compile Include="Task\ConDb.cs" />
-    <Compile Include="Task\GenerateDt.cs" />
-    <Compile Include="Task\ImportDt.cs" />
-    <Compile Include="Task\SearchDB.cs" />
+    <Compile Include="Task\Del.cs" />
+    <Compile Include="Task\InsertGenerate.cs" />
+    <Compile Include="Task\Import.cs" />
+    <Compile Include="Task\Search.cs" />
     <Compile Include="Task\TaskLogic.cs" />
+    <Compile Include="Task\Update.cs" />
     <Compile Include="UI\BinColFrm.cs">
       <SubType>Form</SubType>
     </Compile>

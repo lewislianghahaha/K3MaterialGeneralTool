@@ -33,8 +33,8 @@
             this.tmclose = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.txtname = new System.Windows.Forms.TextBox();
+            this.comtypelist = new System.Windows.Forms.ComboBox();
             this.Menu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -80,21 +80,21 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "数据类型:";
             // 
-            // textBox1
+            // txtname
             // 
-            this.textBox1.Location = new System.Drawing.Point(100, 59);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(163, 21);
-            this.textBox1.TabIndex = 3;
+            this.txtname.Location = new System.Drawing.Point(100, 59);
+            this.txtname.Name = "txtname";
+            this.txtname.Size = new System.Drawing.Size(163, 21);
+            this.txtname.TabIndex = 3;
             // 
-            // comboBox1
+            // comtypelist
             // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(101, 94);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 20);
-            this.comboBox1.TabIndex = 4;
+            this.comtypelist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comtypelist.FormattingEnabled = true;
+            this.comtypelist.Location = new System.Drawing.Point(101, 94);
+            this.comtypelist.Name = "comtypelist";
+            this.comtypelist.Size = new System.Drawing.Size(121, 20);
+            this.comtypelist.TabIndex = 4;
             // 
             // CreateExcelColFrm
             // 
@@ -102,8 +102,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(316, 144);
             this.ControlBox = false;
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.comtypelist);
+            this.Controls.Add(this.txtname);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Menu);
@@ -124,7 +124,7 @@
         private System.Windows.Forms.ToolStripMenuItem tmclose;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.TextBox txtname;
+        private System.Windows.Forms.ComboBox comtypelist;
     }
 }
