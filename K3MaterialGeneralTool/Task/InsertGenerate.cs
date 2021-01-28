@@ -9,8 +9,12 @@ namespace K3MaterialGeneralTool.Task
     //生成新物料 插入记录
     public class InsertGenerate
     {
+        SqlList sqlList = new SqlList();
+        Search search=new Search();
         TempDtList tempDtList=new TempDtList();
         Update update=new Update();
+
+        private string _sqlscript = string.Empty;
 
         /// <summary>
         /// 将数据插入至T_MAT_BindRecord表内
@@ -73,6 +77,39 @@ namespace K3MaterialGeneralTool.Task
             return result;
         }
 
+        /// <summary>
+        /// 同步K3基础资料
+        /// </summary>
+        /// <returns></returns>
+        public bool InsertK3SourceRecord()
+        {
+            var result = true;
+            try
+            {
+                //获取‘导入K3基础资料’临时表
+                var createk3Tempdt = tempDtList.CreateK3BasicSourceTempdt();
+                //获取‘K3基础资料’数据源,并将数据源赋值至createk3Tempdt内
+                 _sqlscript = sqlList.Get_SearchK3SourceRecord();
+                var sourcedt=search.UseSqlSearchIntoDt(0, _sqlscript);
+                //循环将数据插入至createk3Tempdt临时表内
+                foreach (DataRow rows in sourcedt.Rows)
+                {
+                    var newrow = createk3Tempdt.NewRow();
+                    newrow[0] = rows[0];        //Typeid
+                    newrow[1] = rows[1];        //Id
+                    newrow[2] = rows[2];        //FName
+                    newrow[3] = rows[3];        //CreateDt
+                    createk3Tempdt.Rows.Add(newrow);
+                }
+                //执行插入操作
+                ImportDtToDb("T_MAT_Source", createk3Tempdt);
+            }
+            catch (Exception)
+            {
+                result = false;
+            }
+            return result;
+        }
 
         /// <summary>
         /// 针对指定表进行数据插入

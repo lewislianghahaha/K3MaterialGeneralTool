@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
+using K3MaterialGeneralTool.Task;
 
 namespace K3MaterialGeneralTool.UI
 {
     public partial class Main : Form
     {
+        TaskLogic task=new TaskLogic();
+        Load load = new Load();
+
         public Main()
         {
             InitializeComponent();
@@ -20,6 +25,8 @@ namespace K3MaterialGeneralTool.UI
             tmimportexcel.Click += Tmimportexcel_Click;
             tmGenerate.Click += TmGenerate_Click;
 
+
+
             ///////////////查询建档记录///////////////////
             btnSearch.Click += BtnSearch_Click;
 
@@ -31,7 +38,6 @@ namespace K3MaterialGeneralTool.UI
         /// </summary>
         private void OnInitialize()
         {
-
             //设置TabControl控件默认显示页
             tbhistory.SelectedIndex = 1;
         }
@@ -63,7 +69,15 @@ namespace K3MaterialGeneralTool.UI
         {
             try
             {
+                //子线程调用
+                new Thread(InsertK3SourceStart).Start();
+                load.StartPosition = FormStartPosition.CenterScreen;
+                load.ShowDialog();
 
+                if (!task.ResultMark) throw new Exception("同步异常,请联系管理员");
+                {
+                    MessageBox.Show($"同步成功,请点击继续", $"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch (Exception ex)
             {
@@ -112,7 +126,7 @@ namespace K3MaterialGeneralTool.UI
         #region 查询历史记录
 
         /// <summary>
-        /// 查询历名记录功能
+        /// 查询历史记录功能
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -120,6 +134,13 @@ namespace K3MaterialGeneralTool.UI
         {
             try
             {
+
+
+                //子线程调用
+                new Thread(InsertK3SourceStart).Start();
+                load.StartPosition = FormStartPosition.CenterScreen;
+                load.ShowDialog();
+
 
             }
             catch (Exception ex)
@@ -131,5 +152,22 @@ namespace K3MaterialGeneralTool.UI
 
 
         #endregion
+
+        /// <summary>
+        ///子线程使用(重:用于监视功能调用情况,当完成时进行关闭LoadForm)-同步K3基础资料使用
+        /// </summary>
+        private void InsertK3SourceStart()
+        {
+            //绑定
+            task.InsertK3SourceRecord();
+
+            //当完成后将Load子窗体关闭
+            this.Invoke((ThreadStart)(() =>
+            {
+                load.Close();
+            }));
+        }
+
+
     }
 }

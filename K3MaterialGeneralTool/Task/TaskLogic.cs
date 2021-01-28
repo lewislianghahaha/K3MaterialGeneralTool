@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using NPOI.Util;
 
 namespace K3MaterialGeneralTool.Task
 {
@@ -95,6 +96,15 @@ namespace K3MaterialGeneralTool.Task
         public bool InsertExcelNewCol(string colname,string coldatatypename)
         {
             return generate.InsertExcelNewCol(colname,coldatatypename);
+        }
+
+        /// <summary>
+        /// 同步K3基础资料
+        /// </summary>
+        /// <returns></returns>
+        public void InsertK3SourceRecord()
+        {
+            _resultMark = generate.InsertK3SourceRecord();
         }
 
     }

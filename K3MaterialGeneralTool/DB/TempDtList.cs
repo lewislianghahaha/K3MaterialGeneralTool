@@ -72,14 +72,14 @@ namespace K3MaterialGeneralTool.DB
         /// <returns></returns>
         public DataTable MakeImportTempDt()
         {
-            var dt = new DataTable();
             var coltypge = string.Empty;
 
             //获取‘T_MAT_BindExcelCol’表结构
-            dt = searchDb.SearchExcelBindRecord().Copy();
+            var dt = searchDb.SearchExcelBindRecord().Copy();
             //循环生成列,并将列添加至dt表内
             for (var i = 0; i < dt.Rows.Count; i++)
             {
+                //创建列名
                 var dc = new DataColumn {ColumnName = Convert.ToString(dt.Rows[i][1])};
                 //根据ExcelColDataType判断是取那个数据类型
                 switch (Convert.ToString(dt.Rows[i][2]))
@@ -176,6 +176,102 @@ namespace K3MaterialGeneralTool.DB
                     //创建时间
                     case 4:
                         dc.ColumnName = "CreateDt";
+                        dc.DataType = Type.GetType("System.DateTime");
+                        break;
+                }
+                dt.Columns.Add(dc);
+            }
+            return dt;
+        }
+
+        /// <summary>
+        /// 创建K3基础数据临时表
+        /// </summary>
+        /// <returns></returns>
+        public DataTable CreateK3BasicSourceTempdt()
+        {
+            var dt = new DataTable();
+            for (var i = 0; i < 4; i++)
+            {
+                var dc = new DataColumn();
+                switch (i)
+                {
+                    //类型
+                    case 0:
+                        dc.ColumnName = "Typeid";
+                        dc.DataType = Type.GetType("System.Int32");
+                        break;
+                    //记录K3原来的主键值
+                    case 1:
+                        dc.ColumnName = "Id";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //名称
+                    case 2:
+                        dc.ColumnName = "FName";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //创建日期
+                    case 3:
+                        dc.ColumnName = "CreateDt";
+                        dc.DataType = Type.GetType("System.DateTime"); 
+                        break;
+                }
+                dt.Columns.Add(dc);
+            }
+            return dt;
+        }
+
+        /// <summary>
+        /// 创建导入历史记录临时表
+        /// </summary>
+        /// <returns></returns>
+        public DataTable CreateHistoryRecordTempdt()
+        {
+            var dt = new DataTable();
+            for (var i = 0; i < 8; i++)
+            {
+                var dc = new DataColumn();
+                switch (i)
+                {
+                    //主键
+                    case 0:
+                        dc.ColumnName = "Fid";
+                        dc.DataType = Type.GetType("System.Int32");
+                        break;
+                    //物料编码
+                    case 1:
+                        dc.ColumnName = "FMaterialCode";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //物料名称
+                    case 2:
+                        dc.ColumnName = "FMaerialName";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //品牌
+                    case 3:
+                        dc.ColumnName = "FBi";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //规格型号
+                    case 4:
+                        dc.ColumnName = "FKui";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //是否成功
+                    case 5:
+                        dc.ColumnName = "Finishid";
+                        dc.DataType = Type.GetType("System.Int32");
+                        break;
+                    //异常原因
+                    case 6:
+                        dc.ColumnName = "FRemark";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //导入时间
+                    case 7:
+                        dc.ColumnName = "ImportDt";
                         dc.DataType = Type.GetType("System.DateTime");
                         break;
                 }

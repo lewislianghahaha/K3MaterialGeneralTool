@@ -57,15 +57,15 @@
             this.toolStripLabel11 = new System.Windows.Forms.ToolStripLabel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.btnSearch = new System.Windows.Forms.Button();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.txtbin = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.txtkui = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtmaterialname = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
+            this.dtend = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.dtstart = new System.Windows.Forms.DateTimePicker();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -344,15 +344,15 @@
             this.panel4.BackColor = System.Drawing.Color.SteelBlue;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel4.Controls.Add(this.btnSearch);
-            this.panel4.Controls.Add(this.textBox3);
+            this.panel4.Controls.Add(this.txtbin);
             this.panel4.Controls.Add(this.label5);
-            this.panel4.Controls.Add(this.textBox2);
+            this.panel4.Controls.Add(this.txtkui);
             this.panel4.Controls.Add(this.label4);
-            this.panel4.Controls.Add(this.textBox1);
+            this.panel4.Controls.Add(this.txtmaterialname);
             this.panel4.Controls.Add(this.label3);
-            this.panel4.Controls.Add(this.dateTimePicker2);
+            this.panel4.Controls.Add(this.dtend);
             this.panel4.Controls.Add(this.label2);
-            this.panel4.Controls.Add(this.dateTimePicker1);
+            this.panel4.Controls.Add(this.dtstart);
             this.panel4.Controls.Add(this.label1);
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(3, 3);
@@ -369,12 +369,12 @@
             this.btnSearch.Text = "查询";
             this.btnSearch.UseVisualStyleBackColor = true;
             // 
-            // textBox3
+            // txtbin
             // 
-            this.textBox3.Location = new System.Drawing.Point(560, 37);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(147, 21);
-            this.textBox3.TabIndex = 9;
+            this.txtbin.Location = new System.Drawing.Point(560, 37);
+            this.txtbin.Name = "txtbin";
+            this.txtbin.Size = new System.Drawing.Size(147, 21);
+            this.txtbin.TabIndex = 9;
             // 
             // label5
             // 
@@ -385,12 +385,12 @@
             this.label5.TabIndex = 8;
             this.label5.Text = "品牌:";
             // 
-            // textBox2
+            // txtkui
             // 
-            this.textBox2.Location = new System.Drawing.Point(338, 37);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(147, 21);
-            this.textBox2.TabIndex = 7;
+            this.txtkui.Location = new System.Drawing.Point(338, 37);
+            this.txtkui.Name = "txtkui";
+            this.txtkui.Size = new System.Drawing.Size(147, 21);
+            this.txtkui.TabIndex = 7;
             // 
             // label4
             // 
@@ -401,12 +401,12 @@
             this.label4.TabIndex = 6;
             this.label4.Text = "规格型号:";
             // 
-            // textBox1
+            // txtmaterialname
             // 
-            this.textBox1.Location = new System.Drawing.Point(85, 37);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(147, 21);
-            this.textBox1.TabIndex = 5;
+            this.txtmaterialname.Location = new System.Drawing.Point(85, 37);
+            this.txtmaterialname.Name = "txtmaterialname";
+            this.txtmaterialname.Size = new System.Drawing.Size(147, 21);
+            this.txtmaterialname.TabIndex = 5;
             // 
             // label3
             // 
@@ -417,12 +417,12 @@
             this.label3.TabIndex = 4;
             this.label3.Text = "物料名称:";
             // 
-            // dateTimePicker2
+            // dtend
             // 
-            this.dateTimePicker2.Location = new System.Drawing.Point(223, 9);
-            this.dateTimePicker2.Name = "dateTimePicker2";
-            this.dateTimePicker2.Size = new System.Drawing.Size(117, 21);
-            this.dateTimePicker2.TabIndex = 3;
+            this.dtend.Location = new System.Drawing.Point(223, 9);
+            this.dtend.Name = "dtend";
+            this.dtend.Size = new System.Drawing.Size(117, 21);
+            this.dtend.TabIndex = 3;
             // 
             // label2
             // 
@@ -433,12 +433,12 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "-";
             // 
-            // dateTimePicker1
+            // dtstart
             // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(85, 9);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(117, 21);
-            this.dateTimePicker1.TabIndex = 1;
+            this.dtstart.Location = new System.Drawing.Point(85, 9);
+            this.dtstart.Name = "dtstart";
+            this.dtstart.Size = new System.Drawing.Size(117, 21);
+            this.dtstart.TabIndex = 1;
             // 
             // label1
             // 
@@ -740,15 +740,15 @@
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.DataGridView gvhistorydtl;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox txtbin;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox txtkui;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtmaterialname;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.DateTimePicker dateTimePicker2;
+        private System.Windows.Forms.DateTimePicker dtend;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.DateTimePicker dtstart;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.BindingNavigator bnhistoryget;

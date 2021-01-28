@@ -172,7 +172,7 @@ namespace K3MaterialGeneralTool.UI
                 var excelcolname = Convert.ToString(gvexcelBind.SelectedRows[0].Cells[1].Value);
                 var k3Colname = Convert.ToString(gvk3bind.SelectedRows[0].Cells[3].Value);
 
-                var clickMessage = $"您所选择需要进行绑定的字段为:Excel:'{excelcolname}',K3:'{k3Colname}' \n 是否继续?";
+                var clickMessage = $"您所选择需要进行绑定的字段为: \n Excel:'{excelcolname}',K3:'{k3Colname}' \n 是否继续?";
                 if (MessageBox.Show(clickMessage, $"提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     task.Exceid = excelColId;
@@ -184,7 +184,6 @@ namespace K3MaterialGeneralTool.UI
                     load.ShowDialog();
 
                     if(!task.ResultMark) throw new Exception("绑定异常,请联系管理员");
-                    else
                     {
                         MessageBox.Show($"绑定成功,请点击继续", $"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         //绑定完成后对三个GridView都进行数据刷新
@@ -231,8 +230,7 @@ namespace K3MaterialGeneralTool.UI
                     load.StartPosition = FormStartPosition.CenterScreen;
                     load.ShowDialog();
 
-                    if (!task.ResultMark) throw new Exception("绑定异常,请联系管理员");
-                    else
+                    if (!task.ResultMark) throw new Exception("解除绑定异常,请联系管理员");
                     {
                         MessageBox.Show($"解除绑定成功,请点击继续", $"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         //绑定完成后对三个GridView都进行数据刷新

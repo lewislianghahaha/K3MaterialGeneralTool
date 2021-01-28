@@ -90,13 +90,15 @@
         #region 基础数据相关
 
         /// <summary>
-        /// 获取K3-‘物料’各下拉列表记录(初始化基础数据源时使用)
+        /// 获取K3-‘物料’各下拉列表记录(同步基础数据源时使用)
         /// </summary>
         /// <returns></returns>
         public string Get_SearchK3SourceRecord()
         {
             _result = $@"
-                            SELECT X.ID
+                            TRUNCATE TABLE MaterialGeneral.dbo.T_MAT_Source
+
+                            SELECT X.TYPEID,X.ID,X.NAME,X.CreateDt
                             FROM(
                             --品牌
                             SELECT /*A.FID,A.FNUMBER,B.FNUMBER 编号,*/0 TYPEID,B.FENTRYID id,C.FDATAVALUE NAME,GETDATE() CreateDt
@@ -298,6 +300,8 @@
             return _result;
         }
 
+
+
         /// <summary>
         /// 获取原漆K3记录(创建新物料时使用)
         /// </summary>
@@ -345,7 +349,9 @@
         public string Get_SearchHistoryRecord()
         {
             _result = @"
-                            SELECT A.FMaterialCode,A.FMaerialName,A.FBi,A.FKui,A.Finishid,A.FRemark,A.ImportDt
+                            SELECT A.FMaterialCode 物料编码,A.FMaerialName 物料名称,A.FBi 品牌,A.FKui 规格型号,
+                                   CASE A.Finishid WHEN 0 THEN '是' ELSE '否' END 是否成功,
+                                   A.FRemark 异常原因,A.ImportDt 导入时间
                             FROM dbo.T_MAT_ImportHistoryRecord A
                             ORDER BY A.ImportDt
                        ";
