@@ -65,11 +65,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(39, 63);
+            this.label1.Location = new System.Drawing.Point(8, 63);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 12);
+            this.label1.Size = new System.Drawing.Size(89, 12);
             this.label1.TabIndex = 1;
-            this.label1.Text = "字段名称:";
+            this.label1.Text = "Excel字段名称:";
             // 
             // label2
             // 
@@ -109,7 +109,7 @@
             this.Controls.Add(this.Menu);
             this.MainMenuStrip = this.Menu;
             this.Name = "CreateExcelColFrm";
-            this.Text = "新增Excel字段";
+            this.Text = "新增Excel绑定字段";
             this.Menu.ResumeLayout(false);
             this.Menu.PerformLayout();
             this.ResumeLayout(false);

@@ -5,8 +5,6 @@ namespace K3MaterialGeneralTool.UI
 {
     public partial class Main : Form
     {
-        BinColFrm binColFrm=new BinColFrm();
-
         public Main()
         {
             InitializeComponent();
@@ -47,7 +45,7 @@ namespace K3MaterialGeneralTool.UI
         {
             try
             {
-                binColFrm.StartPosition=FormStartPosition.CenterScreen;
+                var binColFrm = new BinColFrm {StartPosition = FormStartPosition.CenterScreen};
                 binColFrm.ShowDialog();
             }
             catch (Exception ex)

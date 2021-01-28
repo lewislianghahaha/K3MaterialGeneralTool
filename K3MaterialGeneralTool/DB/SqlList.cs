@@ -44,7 +44,7 @@
         public string Get_SearchBind()
         {
             _result = @"
-                           SELECT A.Fid,B.ExcelCol Excel字段名称,C.K3ColName K3字段名称,A.BindDt 绑定日期
+                           SELECT A.Fid,A.ExcelColId,A.K3ColId,B.ExcelCol Excel字段名称,C.K3ColName K3字段名称,A.BindDt 绑定日期
                            FROM dbo.T_MAT_BindRecord A
                            INNER JOIN dbo.T_MAT_BindExcelCol B ON A.ExcelColId=B.ExcelColId
                            INNER JOIN dbo.T_MAT_BindK3Col C ON A.K3ColId=C.K3ColId
@@ -71,15 +71,16 @@
         /// </summary>
         /// <param name="exceid"></param>
         /// <param name="k3Id"></param>
+        /// <param name="fid"></param>
         /// <returns></returns>
-        public string Update_RemoveBind(int exceid,int k3Id)
+        public string Update_RemoveBind(int exceid,int k3Id,int fid)
         {
             _result = $@"
                             UPDATE dbo.T_MAT_BindExcelCol SET Bindid=1 WHERE ExcelColId='{exceid}'
 
                             UPDATE dbo.T_MAT_BindK3Col SET Bindid=1 WHERE K3ColId='{k3Id}'
 
-                            DELETE dbo.T_MAT_BindRecord WHERE ExcelColId='{exceid}' AND K3ColId='{k3Id}'
+                            DELETE dbo.T_MAT_BindRecord WHERE Fid='{fid}'
                        ";
             return _result;
         }

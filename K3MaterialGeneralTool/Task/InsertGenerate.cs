@@ -43,6 +43,36 @@ namespace K3MaterialGeneralTool.Task
             return result;
         }
 
+        /// <summary>
+        /// 创建EXCEL新绑定字段使用
+        /// </summary>
+        /// <param name="colname">新字段名称</param>
+        /// <param name="coldatatypename">新字段数据类型名称</param>
+        /// <returns></returns>
+        public bool InsertExcelNewCol(string colname,string coldatatypename)
+        {
+            var result = true;
+            try
+            {
+                //获取绑定记录临时表
+                var createtempdt = tempDtList.CreateNewExcelColTempdt();
+                //将相关记录插入至临时表
+                var newrow = createtempdt.NewRow();
+                newrow[1] = colname;             //列名
+                newrow[2] = coldatatypename;     //列数据类型中文描述
+                newrow[3] = 1;                   //是否绑定标记(0:是 1:否)
+                newrow[4] = DateTime.Now.Date;   //创建日期
+                createtempdt.Rows.Add(newrow);
+                //执行插入操作
+                ImportDtToDb("T_MAT_BindExcelCol", createtempdt);
+            }
+            catch (Exception)
+            {
+                result = false;
+            }
+            return result;
+        }
+
 
         /// <summary>
         /// 针对指定表进行数据插入

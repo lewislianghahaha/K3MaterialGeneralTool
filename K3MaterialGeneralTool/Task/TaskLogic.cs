@@ -11,6 +11,7 @@ namespace K3MaterialGeneralTool.Task
         #region 变量定义
         private int _exceid;                     //Excel绑定ID主键
         private int _k3Id;                       //K3绑定ID主键
+        private int _fid;                        //绑定主键ID
         private DataTable _resultTable;          //返回DT类型
         private bool _resultMark;                //返回是否成功标记
         #endregion
@@ -24,7 +25,10 @@ namespace K3MaterialGeneralTool.Task
         /// K3绑定ID主键
         /// </summary>
         public int K3Id { set { _k3Id = value; } }
-
+        /// <summary>
+        /// 绑定主键ID
+        /// </summary>
+        public int Fid { set { _fid = value; } }
         #endregion
 
         #region Get(返回值至外部)
@@ -75,7 +79,23 @@ namespace K3MaterialGeneralTool.Task
             _resultMark = generate.InsertBindRecord(_exceid, _k3Id);
         }
 
+        /// <summary>
+        /// 解除绑定
+        /// </summary>
+        public void UpdateRemoveBindRecord()
+        {
+            _resultMark = update.UpdateRemoveBindRecord(_exceid,_k3Id,_fid);
+        }
 
+        /// <summary>
+        /// 创建EXCEL新绑定字段使用
+        /// </summary>
+        /// <param name="colname">新字段名称</param>
+        /// <param name="coldatatypename">新字段数据类型名称</param>
+        public bool InsertExcelNewCol(string colname,string coldatatypename)
+        {
+            return generate.InsertExcelNewCol(colname,coldatatypename);
+        }
 
     }
 }

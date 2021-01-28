@@ -141,5 +141,48 @@ namespace K3MaterialGeneralTool.DB
             return dt;
         }
 
+        /// <summary>
+        /// 创建EXCEL新字段临时表
+        /// </summary>
+        /// <returns></returns>
+        public DataTable CreateNewExcelColTempdt()
+        {
+            var dt = new DataTable();
+            for (var i = 0; i < 5; i++)
+            {
+                var dc = new DataColumn();
+                switch (i)
+                {
+                    //主键
+                    case 0:
+                        dc.ColumnName = "ExcelColId";
+                        dc.DataType = Type.GetType("System.Int32");
+                        break;
+                    //列名
+                    case 1:
+                        dc.ColumnName = "ExcelCol";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //列数据类型中文描述
+                    case 2:
+                        dc.ColumnName = "ExcelColDataType";
+                        dc.DataType = Type.GetType("System.String");
+                        break;
+                    //是否绑定标记
+                    case 3:
+                        dc.ColumnName = "Bindid";
+                        dc.DataType=Type.GetType("System.Int32");
+                        break;
+                    //创建时间
+                    case 4:
+                        dc.ColumnName = "CreateDt";
+                        dc.DataType = Type.GetType("System.DateTime");
+                        break;
+                }
+                dt.Columns.Add(dc);
+            }
+            return dt;
+        }
+
     }
 }
