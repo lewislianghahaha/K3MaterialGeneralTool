@@ -90,7 +90,7 @@ namespace K3MaterialGeneralTool.Task
                 var createk3Tempdt = tempDtList.CreateK3BasicSourceTempdt();
                 //获取‘K3基础资料’数据源,并将数据源赋值至createk3Tempdt内
                  _sqlscript = sqlList.Get_SearchK3SourceRecord();
-                var sourcedt=search.UseSqlSearchIntoDt(0, _sqlscript);
+                var sourcedt = search.UseSqlSearchIntoDt(0, _sqlscript);
                 //循环将数据插入至createk3Tempdt临时表内
                 foreach (DataRow rows in sourcedt.Rows)
                 {
@@ -138,7 +138,6 @@ namespace K3MaterialGeneralTool.Task
                 MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
     }
 }

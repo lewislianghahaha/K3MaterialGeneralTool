@@ -71,7 +71,6 @@
     <Compile Include="DB\SqlList.cs" />
     <Compile Include="DB\TempDtList.cs" />
     <Compile Include="Task\ConDb.cs" />
-    <Compile Include="Task\Del.cs" />
     <Compile Include="Task\InsertGenerate.cs" />
     <Compile Include="Task\Import.cs" />
     <Compile Include="Task\Search.cs" />

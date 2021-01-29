@@ -1,5 +1,6 @@
-﻿using System.Data;
-using NPOI.Util;
+﻿using System;
+using System.Data;
+using System.Security.Cryptography.X509Certificates;
 
 namespace K3MaterialGeneralTool.Task
 {
@@ -10,11 +11,28 @@ namespace K3MaterialGeneralTool.Task
         Update update = new Update();
 
         #region 变量定义
+
+        #region 绑定相关变量
         private int _exceid;                     //Excel绑定ID主键
         private int _k3Id;                       //K3绑定ID主键
         private int _fid;                        //绑定主键ID
+        #endregion
+
+        #region 历史记录使用
+        private DateTime _sdt;                   //开始日期
+        private DateTime _edt;                   //结束日期
+        private string _fmaterialname;           //物料名称
+        private string _fkui;                    //规格型号
+        private string _fbi;                     //品牌
+        #endregion
+
+
+
+        #region 返回变量
         private DataTable _resultTable;          //返回DT类型
         private bool _resultMark;                //返回是否成功标记
+        #endregion
+
         #endregion
 
         #region Set(获取外部值)
@@ -30,6 +48,28 @@ namespace K3MaterialGeneralTool.Task
         /// 绑定主键ID
         /// </summary>
         public int Fid { set { _fid = value; } }
+
+
+        /// <summary>
+        /// 开始日期
+        /// </summary>
+        public DateTime Sdt { set { _sdt = value; } }
+        /// <summary>
+        /// 结束日期
+        /// </summary>
+        public DateTime Edt { set { _edt = value; } }
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string Fmaterialname { set { _fmaterialname = value; } }
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string Fkui { set { _fkui = value; } }
+        /// <summary>
+        /// 品牌
+        /// </summary>
+        public string Fbi { set { _fbi = value; } }
         #endregion
 
         #region Get(返回值至外部)
@@ -44,6 +84,7 @@ namespace K3MaterialGeneralTool.Task
         public bool ResultMark => _resultMark;
         #endregion
 
+        #region 绑定功能相关
         /// <summary>
         /// 获取Excel绑定表记录
         /// </summary>
@@ -85,7 +126,7 @@ namespace K3MaterialGeneralTool.Task
         /// </summary>
         public void UpdateRemoveBindRecord()
         {
-            _resultMark = update.UpdateRemoveBindRecord(_exceid,_k3Id,_fid);
+            _resultMark = update.UpdateRemoveBindRecord(_exceid, _k3Id, _fid);
         }
 
         /// <summary>
@@ -93,11 +134,13 @@ namespace K3MaterialGeneralTool.Task
         /// </summary>
         /// <param name="colname">新字段名称</param>
         /// <param name="coldatatypename">新字段数据类型名称</param>
-        public bool InsertExcelNewCol(string colname,string coldatatypename)
+        public bool InsertExcelNewCol(string colname, string coldatatypename)
         {
-            return generate.InsertExcelNewCol(colname,coldatatypename);
+            return generate.InsertExcelNewCol(colname, coldatatypename);
         }
+        #endregion
 
+        #region  主窗体功能相关
         /// <summary>
         /// 同步K3基础资料
         /// </summary>
@@ -106,6 +149,21 @@ namespace K3MaterialGeneralTool.Task
         {
             _resultMark = generate.InsertK3SourceRecord();
         }
+
+        /// <summary>
+        /// 查询历史记录
+        /// </summary>
+        public void SearchHistoryRecord()
+        {
+            _resultTable = searchDb.SearchHistoryRecord(_sdt, _edt, _fmaterialname, _fkui, _fbi);
+        }
+
+        //todo:EXCEL导入
+
+
+        //todo:生成
+
+        #endregion
 
     }
 }
