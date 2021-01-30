@@ -11,7 +11,7 @@ namespace K3MaterialGeneralTool.DB
         #region 绑定相关
 
         /// <summary>
-        /// Excel字段绑定记录(导入EXCEL时动态生成临时表使用)
+        /// Excel字段绑定记录(在‘绑定’功能显示使用)
         /// </summary>
         /// <returns></returns>
         public string Get_SearchBindExcelCol()
@@ -338,6 +338,20 @@ namespace K3MaterialGeneralTool.DB
                             WHERE A.Typeid='{typeid}'
                             AND A.FName='{fname}'
                         ";
+            return _result;
+        }
+
+        /// <summary>
+        /// 导入EXCEL时动态生成临时表使用(注:只针对已绑定的字段进行创建)
+        /// </summary>
+        /// <returns></returns>
+        public string Get_SearchExcelTemp()
+        {
+            _result = @"
+                            SELECT A.ExcelCol 名称,A.ExcelColDataType 数据类型
+                            FROM dbo.T_MAT_BindExcelCol A
+                            where A.Bindid=0
+                       ";
             return _result;
         }
 

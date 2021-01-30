@@ -9,6 +9,7 @@ namespace K3MaterialGeneralTool.Task
         Search searchDb=new Search();
         InsertGenerate generate = new InsertGenerate();
         Update update = new Update();
+        Import import=new Import();
 
         #region 变量定义
 
@@ -26,7 +27,9 @@ namespace K3MaterialGeneralTool.Task
         private string _fbi;                     //品牌
         #endregion
 
-
+        #region Excel导入
+        private string _fileAddress;             //文件地址
+        #endregion
 
         #region 返回变量
         private DataTable _resultTable;          //返回DT类型
@@ -70,6 +73,10 @@ namespace K3MaterialGeneralTool.Task
         /// 品牌
         /// </summary>
         public string Fbi { set { _fbi = value; } }
+        /// <summary>
+        /// 文件地址
+        /// </summary>
+        public string FileAddress { set { _fileAddress = value; } }
         #endregion
 
         #region Get(返回值至外部)
@@ -158,8 +165,13 @@ namespace K3MaterialGeneralTool.Task
             _resultTable = searchDb.SearchHistoryRecord(_sdt, _edt, _fmaterialname, _fkui, _fbi);
         }
 
-        //todo:EXCEL导入
-
+        /// <summary>
+        /// EXCEL导入
+        /// </summary>
+        public void ImportExcelToDt()
+        {
+            _resultTable = import.ImportExcelToDt(_fileAddress);
+        }
 
         //todo:生成
 

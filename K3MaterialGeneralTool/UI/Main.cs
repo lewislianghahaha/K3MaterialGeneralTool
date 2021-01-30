@@ -130,7 +130,19 @@ namespace K3MaterialGeneralTool.UI
                 var openFileDialog = new OpenFileDialog { Filter = $"Xlsx文件|*.xlsx" };
                 if (openFileDialog.ShowDialog() != DialogResult.OK) return;
 
+                task.FileAddress = openFileDialog.FileName;
 
+                //子线程调用
+                new Thread(ImportExcelStart).Start();
+                load.StartPosition = FormStartPosition.CenterScreen;
+                load.ShowDialog();
+                
+                if(task.ResultTable.Rows.Count==0)throw new Exception("导入异常,请联系管理员");
+                {
+                    MessageBox.Show($"导入成功,请点击继续",$"提示",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                    //将记录赋值到GridView内
+                    gvdtl.DataSource = task.ResultTable;
+                }
             }
             catch (Exception ex)
             {
@@ -156,12 +168,12 @@ namespace K3MaterialGeneralTool.UI
         }
 
         /// <summary>
-        /// 
+        /// 子线程使用(重:用于监视功能调用情况,当完成时进行关闭LoadForm)-导入EXCEL使用
         /// </summary>
-        private void SearchHistoryStart()
+        private void ImportExcelStart()
         {
             //绑定
-            task.SearchHistoryRecord();
+            task.ImportExcelToDt();
 
             //当完成后将Load子窗体关闭
             this.Invoke((ThreadStart)(() =>

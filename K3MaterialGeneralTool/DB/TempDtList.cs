@@ -73,16 +73,17 @@ namespace K3MaterialGeneralTool.DB
         public DataTable MakeImportTempDt()
         {
             var coltypge = string.Empty;
-
+            //创建最终结果临时表
+            var resultdt=new DataTable();
             //获取‘T_MAT_BindExcelCol’表结构
-            var dt = searchDb.SearchExcelBindRecord().Copy();
+            var dt = searchDb.Get_SearchExcelTemp().Copy();
             //循环生成列,并将列添加至dt表内
             for (var i = 0; i < dt.Rows.Count; i++)
             {
-                //创建列名
-                var dc = new DataColumn {ColumnName = Convert.ToString(dt.Rows[i][1])};
+                //创建新列名
+                var dc = new DataColumn {ColumnName = Convert.ToString(dt.Rows[i][0])};
                 //根据ExcelColDataType判断是取那个数据类型
-                switch (Convert.ToString(dt.Rows[i][2]))
+                switch (Convert.ToString(dt.Rows[i][1]))
                 {
                     case "字符串":
                         coltypge = "System.String"; 
@@ -98,9 +99,9 @@ namespace K3MaterialGeneralTool.DB
                         break;
                 }
                 dc.DataType = Type.GetType(coltypge);
-                dt.Columns.Add(dc);
+                resultdt.Columns.Add(dc);
             }
-            return dt;
+            return resultdt;
         }
 
         /// <summary>

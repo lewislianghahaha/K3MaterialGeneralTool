@@ -38,7 +38,7 @@ namespace K3MaterialGeneralTool.Task
         }
 
         /// <summary>
-        /// 获取Excel绑定表记录(导入EXCEL时动态生成临时表使用)
+        /// 获取Excel绑定表记录()
         /// </summary>
         /// <returns></returns>
         public DataTable SearchExcelBindRecord()
@@ -77,7 +77,15 @@ namespace K3MaterialGeneralTool.Task
             return UseSqlSearchIntoDt(1, _sqlscript);
         }
 
-
+        /// <summary>
+        /// 导入EXCEL时动态生成临时表使用
+        /// </summary>
+        /// <returns></returns>
+        public DataTable Get_SearchExcelTemp()
+        {
+            _sqlscript = sqlList.Get_SearchExcelTemp();
+            return UseSqlSearchIntoDt(1,_sqlscript);
+        }
 
     }
 }
