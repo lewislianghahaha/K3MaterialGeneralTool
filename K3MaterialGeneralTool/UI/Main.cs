@@ -159,7 +159,21 @@ namespace K3MaterialGeneralTool.UI
         {
             try
             {
+                var clickMessage = $"准备生成,注:此次生成的结果会在‘查询建档历史记录’内进行查阅 \n 是否继续?";
+                if (MessageBox.Show(clickMessage, $"提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                {
+                    //
 
+
+                    //子线程调用
+                    new Thread(ImportExcelStart).Start();
+                    load.StartPosition = FormStartPosition.CenterScreen;
+                    load.ShowDialog();
+
+                    //
+
+
+                }
             }
             catch (Exception ex)
             {
@@ -181,6 +195,8 @@ namespace K3MaterialGeneralTool.UI
                 load.Close();
             }));
         }
+
+
 
         #endregion
 

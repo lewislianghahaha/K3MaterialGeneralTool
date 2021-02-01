@@ -304,6 +304,21 @@ namespace K3MaterialGeneralTool.DB
         }
 
 
+        /// <summary>
+        /// 导入EXCEL时动态生成临时表使用(注:只针对已绑定的字段进行创建)
+        /// </summary>
+        /// <returns></returns>
+        public string Get_SearchExcelTemp()
+        {
+            _result = @"
+                            SELECT A.ExcelCol 名称,A.ExcelColDataType 数据类型
+                            FROM dbo.T_MAT_BindExcelCol A
+                            where A.Bindid=0
+                       ";
+            return _result;
+        }
+
+        #region 生成新物料相关
 
         /// <summary>
         /// 获取原漆K3记录(创建新物料时使用)
@@ -327,7 +342,7 @@ namespace K3MaterialGeneralTool.DB
         /// 获取基础资料数据源(创建新物料时使用)
         /// </summary>
         /// <param name="typeid">类型ID,(0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
-                                      ///13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位)</param>
+        ///13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位)</param>
         /// <param name="fname">名称</param>
         /// <returns></returns>
         public string Get_SearchSourceRecord(int typeid, string fname)
@@ -341,19 +356,472 @@ namespace K3MaterialGeneralTool.DB
             return _result;
         }
 
+        #region 生成所需相关SQL(主要包括生成主键及相关表对应内容)
+
         /// <summary>
-        /// 导入EXCEL时动态生成临时表使用(注:只针对已绑定的字段进行创建)
+        /// 根据‘品牌’及‘规格型号’查找出TOP 1的记录
         /// </summary>
+        /// <param name="bin">品牌名称</param>
+        /// <param name="kui">规格型号</param>
         /// <returns></returns>
-        public string Get_SearchExcelTemp()
+        public string Get_SearchTop1MaterialRecord(string bin,string kui)
         {
-            _result = @"
-                            SELECT A.ExcelCol 名称,A.ExcelColDataType 数据类型
-                            FROM dbo.T_MAT_BindExcelCol A
-                            where A.Bindid=0
-                       ";
+            _result = $@"
+                            SELECT TOP 1 A.FMATERIALID,A.FNUMBER,A.F_YTC_ASSISTANT7,B.FSPECIFICATION FROM dbo.T_BD_MATERIAL A
+                            INNER JOIN dbo.T_BD_MATERIAL_L B ON A.FMATERIALID=B.FMATERIALID AND B.FLOCALEID=2052
+                            WHERE B.FSPECIFICATION='{kui}'
+                            AND A.F_YTC_ASSISTANT7=(
+                                                        SELECT B.FENTRYID id
+                                                        FROM dbo.T_BAS_ASSISTANTDATA a
+                                                        INNER JOIN dbo.T_BAS_ASSISTANTDATAENTRY B ON A.FID=B.FID
+                                                        INNER JOIN dbo.T_BAS_ASSISTANTDATAENTRY_L C ON B.FENTRYID=C.FENTRYID AND C.FLOCALEID=2052
+                                                        WHERE A.FID='57623fb7940f6a'--C.FDATAVALUE LIKE '%威施乐%'
+							                            AND C.FDATAVALUE='{bin}'
+                                                    )
+                            ORDER BY a.FCREATEDATE
+                        ";
             return _result;
         }
+
+        /// <summary>
+        /// 根据typeid获取各表的主键值(一共14个)
+        /// </summary>
+        /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
+        ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
+        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_UNITCONVERTRATE 13:T_MAT_ImportHistoryRecord_Key</param>
+        /// <returns></returns>
+        public string Get_MakeDtidKey(int typeid)
+        {
+            switch (typeid)
+            {
+                case 0:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BAS_ITEM( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BAS_ITEM
+
+	                            DELETE FROM dbo.Z_BAS_ITEM
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 1:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIAL_L( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIAL_L
+
+	                            DELETE FROM dbo.Z_BD_MATERIAL_L
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 2:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALBASE( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALBASE
+
+	                            DELETE FROM dbo.Z_BD_MATERIALBASE
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 3:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALSTOCK( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALSTOCK
+
+	                            DELETE FROM dbo.Z_BD_MATERIALSTOCK
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 4:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALSALE( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALSALE
+
+	                            DELETE FROM dbo.Z_BD_MATERIALSALE
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 5:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALPURCHASE( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALPURCHASE
+
+	                            DELETE FROM dbo.Z_BD_MATERIALPURCHASE
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 6:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALPLAN( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALPLAN
+
+	                            DELETE FROM dbo.Z_BD_MATERIALPLAN
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 7:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALPRODUCE( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALPRODUCE
+
+	                            DELETE FROM dbo.Z_BD_MATERIALPRODUCE
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 8:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALINVPTY( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALINVPTY
+
+	                            DELETE FROM dbo.Z_BD_MATERIALINVPTY
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 9:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALSUBCON( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALSUBCON
+
+	                            DELETE FROM dbo.Z_BD_MATERIALSUBCON
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 10:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALQUALITY( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALQUALITY
+
+	                            DELETE FROM dbo.Z_BD_MATERIALQUALITY
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 11:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALAUXPTY( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALAUXPTY
+
+	                            DELETE FROM dbo.Z_BD_MATERIALAUXPTY
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 12:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_UNITCONVERTRATE( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_UNITCONVERTRATE
+
+	                            DELETE FROM dbo.Z_BD_UNITCONVERTRATE
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                case 13:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.T_MAT_ImportHistoryRecord_Key( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.T_MAT_ImportHistoryRecord_Key
+
+	                            DELETE FROM dbo.T_MAT_ImportHistoryRecord_Key
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+            }
+            return _result;
+        }
+
+        /// <summary>
+        /// 1)根据fmaterialid查询出数据源 2)用于动态生成临时表(最后更新及插入使用)
+        /// </summary>
+        /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
+        ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
+        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_UNITCONVERTRATE</param>
+        /// <param name="fmaterialid"></param>
+        /// <returns></returns>
+        public string Get_SearchMaterialSource(int typeid,int fmaterialid)
+        {
+            switch (typeid)
+            {
+                case 0:
+                    _result = $@"
+                            SELECT FMATERIALID ,FNUMBER ,FOLDNUMBER ,FMNEMONICCODE ,FMASTERID ,
+                                   FMATERIALGROUP ,FCREATEORGID ,FUSEORGID ,FCREATORID ,FCREATEDATE ,
+	                               FMODIFIERID ,FMODIFYDATE ,FDOCUMENTSTATUS ,FFORBIDSTATUS ,FAPPROVERID ,
+                                   FAPPROVEDATE ,FFORBIDDERID ,FFORBIDDATE ,FIMAGE ,FPLMMATERIALID ,
+                                   FMATERIALSRC ,FIMAGEFILESERVER ,FIMGSTORAGETYPE ,F_YTC_ASSISTANT ,F_YTC_ASSISTANT1 ,
+                                   F_YTC_ASSISTANT11 ,F_YTC_ASSISTANT111 ,F_YTC_ASSISTANT1111 ,F_YTC_ASSISTANT11111 ,
+                                   F_YTC_ASSISTANT111111 ,F_YTC_BASE ,F_YTC_ASSISTANT2 ,F_YTC_ASSISTANT3 ,F_YTC_ASSISTANT31 ,
+                                   F_YTC_DECIMAL ,F_YTC_BASE1 ,F_YTC_DECIMAL1 ,F_YTC_DECIMAL2 ,F_YTC_TEXT ,
+                                   F_YTC_REMARK ,F_YTC_ASSISTANT4 ,F_YTC_ASSISTANT5 ,F_YTC_IMAGE ,FISSALESBYNET ,
+                                   F_YTC_ASSISTANT6 ,F_YTC_ASSISTANT7 ,F_YTC_REMARK1 ,F_YTC_INTEGER ,F_YTC_DECIMAL3 ,
+                                   F_YTC_DECIMAL4 ,F_YTC_DECIMAL5 ,F_YTC_DECIMAL6 ,F_YTC_TEXT1 ,F_YTC_TEXT2 /*,
+                                   F_YTC_BASE2 ,F_YTC_BASE3 ,F_YTC_TEXT9 ,F_YTC_DECIMAL7 ,F_YTC_DECIMAL8 ,
+                                   F_YTC_TEXT8 ,F_YTC_TEXT7 ,F_YTC_TEXT6 ,F_YTC_TEXT5 ,F_YTC_ASSISTANT8 ,
+                                   F_YTC_TEXT4 ,F_YTC_TEXT3 ,F_YTC_TEXT10 ,F_YTC_TEXT11 ,F_YTC_REMARK2 ,
+                                   F_YTC_REMARK3 */
+                            FROM dbo.T_BD_MATERIAL
+                            WHERE FMATERIALID='{fmaterialid}'
+                        ";
+                    break;
+                case 1:
+                    _result = $@"
+                            SELECT A.FPKID ,A.FMATERIALID ,A.FLOCALEID ,A.FNAME ,A.FSPECIFICATION ,
+                                   A.FDESCRIPTION 
+                            FROM dbo.T_BD_MATERIAL_L A
+                            INNER JOIN T_BD_MATERIAL B ON A.FMATERIALID = B.FMATERIALID 
+                            WHERE B.FMATERIALID='{fmaterialid}'
+                        ";
+                    break;
+                case 2:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FERPCLSID ,A.FCATEGORYID ,
+                                           A.FBASEUNITID ,A.FISPURCHASE ,A.FISSALE ,A.FISINVENTORY ,
+                                           A.FISPRODUCE ,A.FISSUBCONTRACT ,A.FISPICK ,A.FISASSET ,
+                                           A.FISREALTIMEACCOUT ,A.FTAXTYPE ,A.FTYPEID ,A.FTAXRATEID ,
+                                           A.FISVMIBUSINESS ,A.FGROSSWEIGHT ,A.FNETWEIGHT ,A.FWEIGHTUNITID ,
+                                           A.FLENGTH ,A.FWIDTH ,A.FHEIGHT,A.FVOLUME ,A.FVOLUMEUNITID ,
+                                           A.FBARCODE ,A.FCONFIGTYPE 
+                                    FROM dbo.T_BD_MATERIALBASE A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
+                                ";
+                    break;
+                case 3:
+                    _result = $@"
+                                SELECT A.FENTRYID ,A.FMATERIALID ,A.FSTOREUNITID ,A.FAUXUNITID ,
+                                        A.FISSTOCKLIMIT ,A.FSTOCKID ,A.FISSPLIMIT ,A.FSTOCKPLACEID ,
+                                        A.FSTOCKERID ,A.FDELIVERYLEADTIME ,A.FISWORKDAY ,A.FISLOCKSTOCK ,
+                                        A.FISAUTOUNLOCKSTOCK ,A.FAUTOUNLOCKSTOCKDAYS ,A.FISBATCHMANAGE ,A.FBATCHRULEID ,
+                                        A.FISKFPERIOD ,A.FEXPUNIT ,A.FEXPPERIOD ,A.FISEXPPARTOFLOT ,
+	                                    A.FONLINELIFE ,A.FSTOREURNUM ,A.FSTOREURNOM ,A.FISCYCLECOUNTING ,
+                                        A.FISMUSTCOUNTING ,A.FBATCHLEVEL ,A.FCURRENCYID ,A.FREFCOST ,
+                                        A.FCOUNTCYCLE ,A.FCOUNTDAY ,A.FISSNMANAGE ,A.FSNCODERULE ,
+                                        A.FSNUNIT ,A.FSNMANAGETYPE ,A.FISAUTOCREATEDCSN ,A.FSNCREATETIME ,
+                                        A.FSAFESTOCK ,A.FREORDERGOOD ,A.FMINSTOCK ,A.FMAXSTOCK ,
+                                        A.FUNITCONVERTDIR ,A.FISENABLEMINSTOCK ,A.FISENABLESAFESTOCK ,A.FISENABLEREORDER ,
+                                        A.FISENABLEMAXSTOCK ,A.FECONREORDERQTY ,A.FISSNPRDTRACY 
+                                FROM dbo.T_BD_MATERIALSTOCK A
+                                INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
+                                ";
+                    break;
+                case 4:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FSALEUNITID ,A.FSALEPRICEUNITID ,
+                                           A.FORDERQTY ,A.FMINQTY ,A.FMAXQTY ,A.FOVERSENDPERCENT ,
+                                           A.FISATPCHECK ,A.FISINVOICE ,A.FISOVERSEND ,A.FISRETURN ,
+                                           A.FISRETURNPART ,A.FISRETURNCHECK ,A.FSALEURNUM ,A.FSALEURNOM ,
+                                           A.FSALEPRICEURNUM ,A.FSALEPRICEURNOM ,A.FOUTSTOCKLMTH ,A.FOUTSTOCKLMTL ,
+                                           A.FAGENTSALREDUCERATE ,A.FALLOWPUBLISH ,A.FGOODSTYPEID ,A.FISAFTERSALE ,
+                                           A.FISPRODUCTFILES ,A.FISWARRANTED ,A.FWARRANTYUNITID ,A.FWARRANTY ,
+                                           A.FOUTLMTUNIT ,A.FTAXCATEGORYCODEID 
+                                    FROM dbo.T_BD_MATERIALSALE A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
+                                ";
+                    break;
+                case 5:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FPURCHASEUNITID ,A.FPURCHASEPRICEUNITID ,
+                                           A.FPURCHASERID ,A.FPURCHASEGROUPID ,A.FDEFAULTVENDORID ,A.FISVENDORQUALIFICATION ,
+                                           A.FISSOURCECONTROL ,A.FISPR ,A.FPURCHASETIMES ,A.FMINPOAMOUNT ,
+                                           A.FISEXCESSRECEIVE ,A.FRECEIVEMAXSCALE ,A.FRECEIVEMINSCALE ,A.FRECEIVEADVANCEDAYS ,
+                                           A.FRECEIVEDELAYDAYS ,A.FTAXCODE ,A.FPURURNUM ,A.FPURURNOM ,
+                                           A.FPURPRICEURNUM ,A.FPURPRICEURNOM ,A.FISQUOTA ,A.FQUOTATYPE ,
+                                           A.FMINSPLITQTY ,A.FAGENTPURPLUSRATE ,A.FCHARGEID ,A.FISLIMITPRICE ,
+                                           A.FBASEMINSPLITQTY ,A.FISVMIBUSINESS ,A.FISRETURNMATERIAL ,A.FENABLESL ,
+                                           A.FPURCHASEORGID ,A.FDEFBARCODERULEID ,A.FMINPACKCOUNT ,A.FPRINTCOUNT
+                                    FROM dbo.T_BD_MATERIALPURCHASE A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
+                                ";
+                    break;
+                case 6:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FPLANNINGSTRATEGY ,A.FORDERPOLICY ,
+                                           A.FPLANWORKSHOP ,A.FFIXLEADTIMETYPE ,A.FFIXLEADTIME ,A.FVARLEADTIMETYPE ,
+                                           A.FVARLEADTIME ,A.FCHECKLEADTIMETYPE ,A.FCHECKLEADTIME ,A.FORDERINTERVALTIMETYPE ,
+                                           A.FORDERINTERVALTIME ,A.FMAXPOQTY ,A.FMINPOQTY ,A.FINCREASEQTY ,A.FEOQ ,
+                                           A.FVARLEADTIMELOTSIZE ,FBASEVARLEADTIMELOTSIZE ,FPLANINTERVALSDAYS ,FPLANBATCHSPLITQTY ,
+                                           A.FREQUESTTIMEZONE ,FPLANTIMEZONE ,FPLANERID ,FISMRPCOMREQ ,FISMADETOPUR ,
+	                                       A.FRESERVETYPE ,A.FCANLEADDAYS ,A.FLEADEXTENDDAY ,A.FCANDELAYDAYS ,
+                                           A.FDELAYEXTENDDAY ,A.FPLANOFFSETTIMETYPE ,A.FPLANOFFSETTIME ,A.FPLANGROUPID ,
+                                           A.FTIMEFACTORID ,A.FQTYFACTORID ,A.FSUPPLYSOURCEID ,A.FMFGPOLICYID ,
+                                           A.FPLANMODE ,A.FALLOWPARTAHEAD ,A.FALLOWPARTDELAY ,A.FPLANSAFESTOCKQTY 
+                                    FROM dbo.T_BD_MATERIALPLAN A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
+                                ";
+                    break;
+                case 7:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FWORKSHOPID ,A.FPRODUCEUNITID ,A.FBOMUNITID ,
+                                           A.FUSETYPE ,A.FFIXLOSS ,A.FLOSSPERCENT ,A.FPROCESSID ,A.FISMAINPRD ,
+                                           A.FISCOBY ,A.FDEFAULTROUTING ,A.FPERUNITSTANDHOUR ,A.FISSUETYPE ,A.FBKFLTIME ,
+                                           A.FPICKSTOCKID ,A.FPICKBINID ,A.FISOVERISSUE ,A.FOVERISSUEPERCENT ,A.FISKITTING ,
+                                           A.FFINISHRECEIPTOVERRATE ,A.FFINISHRECEIPTSHORTRATE ,A.FPRDURNUM ,A.FPRDURNOM ,
+                                           A.FBOMURNUM ,A.FBOMURNOM ,A.FISCOMPLETESET ,A.FOVERCONTROLMODE ,A.FMINISSUEQTY ,
+                                           A.FSTDLABORPREPARETIME ,A.FSTDLABORPROCESSTIME ,A.FSTDMACHINEPREPARETIME ,A.FSTDMACHINEPROCESSTIME ,
+                                           A.FCONSUMVOLATITITY ,A.FISPRODUCTLINE ,A.FPRODUCEBILLTYPE ,A.FORGTRUSTBILLTYPE ,A.FISMINISSUEQTY ,
+                                           A.FISECN ,A.FMINISSUEUNITID ,A.FMDLID ,A.FMDLMATERIALID 
+                                    FROM dbo.T_BD_MATERIALPRODUCE A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
+                                ";
+                    break;
+                case 8:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FAUXPROPERTYID ,A.FISENABLE ,
+                                           A.FISCOMCONTROL ,A.FISMUSTINPUT ,A.FISAFFECTPRICE ,A.FISAFFECTPLAN ,
+                                           A.FISAFFECTCOST ,A.FVALUETYPE ,A.FVALUESET 
+                                    FROM dbo.T_BD_MATERIALAUXPTY A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
+                                ";
+                    break;
+                case 9:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FINVPTYID ,A.FISENABLE ,
+                                           A.FISAFFECTPRICE ,A.FISAFFECTPLAN ,A.FISAFFECTCOST 
+                                    FROM  dbo.T_BD_MATERIALINVPTY A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
+                                ";
+                    break;
+                case 10:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FSUBCONUNITID ,A.FSUBCONPRICEUNITID ,
+                                           A.FSUBCONURNUM ,A.FSUBCONURNOM ,A.FSUBCONPRICEURNUM ,
+                                           A.FSUBCONPRICEURNOM ,A.FSUBBILLTYPE 
+                                    FROM dbo.T_BD_MATERIALSUBCON A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
+                                ";
+                    break;
+                case 11:
+                    _result = $@"
+                                    SELECT A.FENTRYID ,A.FMATERIALID ,A.FCHECKPRODUCT ,
+                                           A.FCHECKINCOMING ,A.FINCSAMPSCHEMEID ,A.FINCQCSCHEMEID ,A.FCHECKSTOCK ,
+                                           A.FENABLECYCLISTQCSTK ,A.FSTOCKCYCLE ,A.FENABLECYCLISTQCSTKEW ,
+                                           A.FEWLEADDAY ,A.FCHECKRETURN ,A.FCHECKDELIVERY ,A.FINSPECTGROUPID ,
+                                           A.FINSPECTORID
+                                    FROM dbo.T_BD_MATERIALQUALITY A
+                                    INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
+                                    WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
+                                ";
+                    break;
+                case 12:
+                    _result = $@"
+                                    SELECT FUNITCONVERTRATEID , FMASTERID ,FBILLNO ,
+                                           FFORMID ,FMATERIALID ,FCURRENTUNITID ,
+                                           FDESTUNITID ,FCONVERTTYPE ,FCONVERTNUMERATOR ,
+                                           FCONVERTDENOMINATOR ,FCREATEORGID ,FUSEORGID ,
+                                           FCREATORID ,FCREATEDATE ,FMODIFIERID ,
+                                           FMODIFYDATE ,FAPPROVERID ,FAPPROVEDATE ,
+                                           FFORBIDDERID ,FFORBIDDATE ,FDOCUMENTSTATUS ,
+                                           FFORBIDSTATUS ,FUNITID 
+                                    FROM dbo.T_BD_UNITCONVERTRATE
+                                ";
+                    break;
+            }
+            return _result;
+        }
+
+        #endregion
+
+        #endregion
 
         #endregion
 

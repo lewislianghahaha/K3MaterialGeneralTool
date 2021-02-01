@@ -281,5 +281,19 @@ namespace K3MaterialGeneralTool.DB
             return dt;
         }
 
+        /// <summary>
+        /// 根据各typeid动态生成对应的临时表(在生成时使用)
+        /// </summary>
+        /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
+        ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
+        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_UNITCONVERTRATE</param>
+        /// <param name="fmaterialid"></param>
+        /// <returns></returns>
+        public DataTable CreateK3ImportTempDt(int typeid,int fmaterialid)
+        {
+            var dt = searchDb.Get_SearchMaterialSourceAndCreateTemp(typeid,fmaterialid).Clone();
+            return dt;
+        }
+
     }
 }

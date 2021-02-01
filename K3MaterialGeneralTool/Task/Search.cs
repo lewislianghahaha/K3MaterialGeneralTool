@@ -87,5 +87,19 @@ namespace K3MaterialGeneralTool.Task
             return UseSqlSearchIntoDt(1,_sqlscript);
         }
 
+        /// <summary>
+        /// 1)根据fmaterialid查询出数据源 2)用于动态生成临时表(最后更新及插入使用)
+        /// </summary>
+        /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
+        ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
+        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_UNITCONVERTRATE</param>
+        /// <param name="fmaterialid"></param>
+        /// <returns></returns>
+        public DataTable Get_SearchMaterialSourceAndCreateTemp(int typeid, int fmaterialid)
+        {
+            _sqlscript = sqlList.Get_SearchMaterialSource(typeid, fmaterialid);
+            return UseSqlSearchIntoDt(0,_sqlscript);
+        }
+
     }
 }
