@@ -61,6 +61,22 @@ namespace K3MaterialGeneralTool.UI
                 gvresult.DataSource = GlobalClasscs.RDt.Resultdt;
                 panel5.Visible = false;
             }
+            //todo:动态改变GridView列名
+
+            //控制GridView单元格显示方式及转换列名
+            ControlGridViewisShow();
+        }
+
+
+
+        /// <summary>
+        /// 控制GridView单元格显示方式
+        /// </summary>
+        private void ControlGridViewisShow()
+        {
+            //注:当没有值时,若还设置某一行Row不显示的话,就会出现异常
+            if (gvresult?.RowCount >= 0)
+                gvresult.Columns[0].Visible = false;
         }
 
         /// <summary>

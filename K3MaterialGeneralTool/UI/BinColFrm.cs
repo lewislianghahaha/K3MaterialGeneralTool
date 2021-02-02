@@ -312,6 +312,8 @@ namespace K3MaterialGeneralTool.UI
                 gvbind.Columns[0].Visible = false;
                 gvbind.Columns[1].Visible = false;
                 gvbind.Columns[2].Visible = false;
+                gvbind.Columns[5].Visible = false;
+                gvbind.Columns[6].Visible = false;
             }
         }
 

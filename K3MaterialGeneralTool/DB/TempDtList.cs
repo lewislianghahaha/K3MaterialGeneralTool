@@ -224,7 +224,7 @@ namespace K3MaterialGeneralTool.DB
         }
 
         /// <summary>
-        /// 创建导入历史记录临时表
+        /// 创建导入历史记录临时表(结果集)
         /// </summary>
         /// <returns></returns>
         public DataTable CreateHistoryRecordTempdt()

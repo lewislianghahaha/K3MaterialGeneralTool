@@ -46,7 +46,8 @@ namespace K3MaterialGeneralTool.DB
         public string Get_SearchBind()
         {
             _result = @"
-                           SELECT A.Fid,A.ExcelColId,A.K3ColId,B.ExcelCol Excel字段名称,C.K3ColName K3字段名称,A.BindDt 绑定日期
+                           SELECT A.Fid,A.ExcelColId,A.K3ColId,B.ExcelCol Excel字段名称,C.K3ColName K3字段名称,C.K3Col K3列名,C.K3ColTableName K3表名,
+                                  A.BindDt 绑定日期
                            FROM dbo.T_MAT_BindRecord A
                            INNER JOIN dbo.T_MAT_BindExcelCol B ON A.ExcelColId=B.ExcelColId
                            INNER JOIN dbo.T_MAT_BindK3Col C ON A.K3ColId=C.K3ColId
@@ -366,7 +367,7 @@ namespace K3MaterialGeneralTool.DB
         public string Get_SearchTop1MaterialRecord(string bin,string kui)
         {
             _result = $@"
-                            SELECT TOP 1 A.FMATERIALID,A.FNUMBER,A.F_YTC_ASSISTANT7,B.FSPECIFICATION 
+                            SELECT TOP 1 A.FMATERIALID
                             FROM dbo.T_BD_MATERIAL A
                             INNER JOIN dbo.T_BD_MATERIAL_L B ON A.FMATERIALID=B.FMATERIALID AND B.FLOCALEID=2052
                             WHERE B.FSPECIFICATION='{kui}'
@@ -852,6 +853,30 @@ namespace K3MaterialGeneralTool.DB
                             SELECT A.FNUMMAX FROM dbo.T_BAS_BILLCODES A
                             WHERE A.FRULEID='eeb39bd33e0441d789661e1a7e8944f0'
                             AND A.FBYVALUE='{fmaterialnumber}'
+                        ";
+            return _result;
+        }
+
+        /// <summary>
+        /// 根据新物料ID,将相关表进行删除
+        /// </summary>
+        /// <param name="fmaterialid"></param>
+        /// <returns></returns>
+        public string DelNewMaterialRecord(int fmaterialid)
+        {
+            _result = $@"
+                             delete from dbo.T_BD_MATERIAL where fmaterialid='{fmaterialid}'
+                             delete from dbo.T_BD_MATERIAL_L where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_BD_MaterialBase where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_BD_MaterialStock where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_BD_MaterialSale where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_bd_MaterialPurchase where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_BD_MaterialPlan where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_BD_MaterialProduce where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_BD_MaterialAuxPty where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_BD_MaterialInvPty where fmaterialid='{fmaterialid}'
+                             delete from dbo.t_bd_MaterialSubcon where fmaterialid='{fmaterialid}'
+                             delete from dbo.T_BD_MATERIALQUALITY where fmaterialid='{fmaterialid}'
                         ";
             return _result;
         }

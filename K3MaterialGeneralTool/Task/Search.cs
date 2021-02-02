@@ -148,10 +148,10 @@ namespace K3MaterialGeneralTool.Task
         /// <param name="bin">品牌名称</param>
         /// <param name="kui">规格型号</param>
         /// <returns></returns>
-        public DataTable SearchTop1MaterialRecord(string bin, string kui)
+        public int SearchTop1MaterialRecord(string bin, string kui)
         {
             _sqlscript = sqlList.Get_SearchTop1MaterialRecord(bin, kui);
-            return UseSqlSearchIntoDt(0, _sqlscript);
+            return Convert.ToInt32(UseSqlSearchIntoDt(0, _sqlscript).Rows[0][0]);
         }
 
         /// <summary>
@@ -204,6 +204,16 @@ namespace K3MaterialGeneralTool.Task
         {
             _sqlscript = sqlList.SearchUnitMaxKey(fmaterialnumber);
             return UseSqlSearchIntoDt(0, _sqlscript);
+        }
+
+        /// <summary>
+        /// 根据新物料ID,将相关表进行删除
+        /// </summary>
+        /// <returns></returns>
+        public bool DelNewMaterialRecord(int fmaterialid)
+        {
+            _sqlscript = sqlList.DelNewMaterialRecord(fmaterialid);
+            return Generdt(0, _sqlscript);
         }
 
         #endregion
