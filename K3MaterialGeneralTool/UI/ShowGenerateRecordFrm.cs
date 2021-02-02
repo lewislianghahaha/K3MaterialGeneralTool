@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Data;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
-using K3MaterialGeneralTool.Task;
 
 namespace K3MaterialGeneralTool.UI
 {
-    public partial class Main : Form
+    public partial class ShowGenerateRecordFrm : Form
     {
-        TaskLogic task=new TaskLogic();
-        Load load = new Load();
-
-        #region 变量参数
+        #region 参数定义
         //保存查询出来的GridView记录
         private DataTable _dtl;
         //记录当前页数(GridView页面跳转使用)
@@ -23,23 +18,16 @@ namespace K3MaterialGeneralTool.UI
         private bool _pageChange;
         #endregion
 
-        public Main()
+        public ShowGenerateRecordFrm()
         {
             InitializeComponent();
-            OnInitialize();
             OnRegisterEvents();
+            OnInitialize();
         }
 
         private void OnRegisterEvents()
         {
-            tmBindCol.Click += TmBindCol_Click;
-            tmUpdate.Click += TmUpdate_Click;
-            ////////////////新物料导入生成////////////////
-            tmimportexcel.Click += Tmimportexcel_Click;
-            tmGenerate.Click += TmGenerate_Click;
-
-            ///////////////查询建档记录///////////////////
-            btnSearch.Click += BtnSearch_Click;
+            tmclose.Click += Tmclose_Click;
             bnMoveFirstItem.Click += BnMoveFirstItem_Click;
             bnMovePreviousItem.Click += BnMovePreviousItem_Click;
             bnMoveNextItem.Click += BnMoveNextItem_Click;
@@ -54,209 +42,10 @@ namespace K3MaterialGeneralTool.UI
         /// </summary>
         private void OnInitialize()
         {
-            //设置TabControl控件默认显示页
-            tbhistory.SelectedIndex = 1;
-        }
-
-        /// <summary>
-        /// 绑定功能
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TmBindCol_Click(object sender, EventArgs e)
-        {
-            try
+            //将生成后的结果集赋值给_dtl,并触发相关TAB CONTROL方法
+            if (GlobalClasscs.RDt.Resultdt.Rows.Count>0)
             {
-                var binColFrm = new BinColFrm {StartPosition = FormStartPosition.CenterScreen};
-                binColFrm.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// 同步基础资料功能
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TmUpdate_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                //子线程调用
-                new Thread(InsertK3SourceStart).Start();
-                load.StartPosition = FormStartPosition.CenterScreen;
-                load.ShowDialog();
-
-                if (!task.ResultMark) throw new Exception("同步异常,请联系管理员");
-                {
-                    MessageBox.Show($"同步成功,请点击继续", $"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        ///子线程使用(重:用于监视功能调用情况,当完成时进行关闭LoadForm)-同步基础资料使用
-        /// </summary>
-        private void InsertK3SourceStart()
-        {
-            //绑定
-            task.InsertK3SourceRecord();
-
-            //当完成后将Load子窗体关闭
-            this.Invoke((ThreadStart)(() =>
-            {
-                load.Close();
-            }));
-        }
-
-        #region 新物料导入生成
-
-        /// <summary>
-        /// 导入EXCEL数据
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Tmimportexcel_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                var openFileDialog = new OpenFileDialog { Filter = $"Xlsx文件|*.xlsx" };
-                if (openFileDialog.ShowDialog() != DialogResult.OK) return;
-
-                task.FileAddress = openFileDialog.FileName;
-
-                //子线程调用
-                new Thread(ImportExcelStart).Start();
-                load.StartPosition = FormStartPosition.CenterScreen;
-                load.ShowDialog();
-                
-                if(task.ResultTable.Rows.Count==0)throw new Exception("导入异常,请联系管理员");
-                {
-                    MessageBox.Show($"导入成功,请点击继续",$"提示",MessageBoxButtons.OK,MessageBoxIcon.Information);
-                    //将记录赋值到GridView内
-                    gvdtl.DataSource = task.ResultTable;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// 生成K3新物料
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TmGenerate_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                if(gvdtl.RowCount==0) throw new Exception("检测到没有内容进行生成,请先进行导入Excel再继续");
-                var clickMessage = $"准备生成,\n 注:此次生成的结果会记录在‘查询建档历史记录’内 \n 是否继续?";
-                if (MessageBox.Show(clickMessage, $"提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-                {
-                    //通过gvdtl获取内容并转化至DataTable
-                    task.ImportGridviewdt = (DataTable) gvdtl.DataSource;
-
-                    //子线程调用
-                    new Thread(GenerateRecordStart).Start();
-                    load.StartPosition = FormStartPosition.CenterScreen;
-                    load.ShowDialog();
-
-                    //返回结果并执行相关提示
-                    if(!task.ResultMark) throw new Exception("生成异常,请联系管理员");
-                    {
-                        //将返回结果DT传送至'生成结果'窗体,并进行显示
-                        var showGenerateRecordFrm = new ShowGenerateRecordFrm { StartPosition = FormStartPosition.CenterScreen };
-                        showGenerateRecordFrm.ShowDialog();
-
-                        //当‘生成结果’窗体退出后,将gvdtl内容清空
-                        var dt = (DataTable) gvdtl.DataSource;
-                        dt.Rows.Clear();
-                        dt.Columns.Clear();
-                        gvdtl.DataSource = dt;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// 子线程使用(重:用于监视功能调用情况,当完成时进行关闭LoadForm)-导入EXCEL使用
-        /// </summary>
-        private void ImportExcelStart()
-        {
-            //导入EXCEL
-            task.ImportExcelToDt();
-
-            //当完成后将Load子窗体关闭
-            this.Invoke((ThreadStart)(() =>
-            {
-                load.Close();
-            }));
-        }
-
-        /// <summary>
-        /// 子线程使用(重:用于监视功能调用情况,当完成时进行关闭LoadForm)-生成使用
-        /// </summary>
-        private void GenerateRecordStart()
-        {
-            //生成
-            task.GenerateRecord();
-
-            //当完成后将Load子窗体关闭
-            this.Invoke((ThreadStart)(() =>
-            {
-                load.Close();
-            }));
-        }
-
-        #endregion
-
-        #region 查询历史记录
-
-        /// <summary>
-        /// 根据所选的选择条件刷新GridView
-        /// </summary>
-        private void OnSearchHistory()
-        {
-            //获取所选择的'开始'日期
-            var sdt = dtstart.Value.Date;
-            //获取所选择的'结束'日期
-            var edt = dtend.Value.Date;
-            //获取‘物料名称’记录
-            var materialname = txtmaterialname.Text;
-            //获取‘规格型号’记录
-            var kui = txtkui.Text;
-            //获取‘品牌’记录
-            var bin = txtbin.Text;
-
-            //将各变量值赋给task变量
-            task.Sdt = sdt;
-            task.Edt = edt;
-            task.Fmaterialname = materialname;
-            task.Fkui = kui;
-            task.Fbi = bin;
-
-            //子线程调用
-            new Thread(SearchHistoryStart).Start();
-            load.StartPosition = FormStartPosition.CenterScreen;
-            load.ShowDialog();
-
-            if (task.ResultTable.Rows.Count > 0)
-            {
-                _dtl = task.ResultTable;
+                _dtl = GlobalClasscs.RDt.Resultdt;
                 panel5.Visible = true;
                 //初始化下拉框所选择的默认值
                 tmshowrows.SelectedItem = Convert.ToInt32(tmshowrows.SelectedItem) == 0
@@ -267,57 +56,33 @@ namespace K3MaterialGeneralTool.UI
                 //GridView分页
                 GridViewPageChange();
             }
-            //注:当为空记录时,不显示跳转页;只需将临时表赋值至GridView内
             else
             {
-                gvhistorydtl.DataSource = task.ResultTable;
+                gvresult.DataSource = GlobalClasscs.RDt.Resultdt;
                 panel5.Visible = false;
             }
-            //控制GridView单元格显示方式
-            ControlHistoryGridViewisShow();
         }
 
         /// <summary>
-        /// 查询历史记录功能
+        /// 关闭
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BtnSearch_Click(object sender, EventArgs e)
+        private void Tmclose_Click(object sender, EventArgs e)
         {
+            //退出时先将内容清空再退出
             try
             {
-                //根据所选的选择条件刷新GridView
-                OnSearchHistory();
+                var dt = (DataTable) gvresult.DataSource;
+                dt.Rows.Clear();
+                dt.Columns.Clear();
+                gvresult.DataSource = dt;
+                this.Close();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        /// <summary>
-        ///子线程使用(重:用于监视功能调用情况,当完成时进行关闭LoadForm)-查询历史记录使用
-        /// </summary>
-        private void SearchHistoryStart()
-        {
-            //查询历史记录
-            task.SearchHistoryRecord();
-
-            //当完成后将Load子窗体关闭
-            this.Invoke((ThreadStart)(() =>
-            {
-                load.Close();
-            }));
-        }
-
-        /// <summary>
-        /// 控制GridView单元格显示方式
-        /// </summary>
-        private void ControlHistoryGridViewisShow()
-        {
-            //注:当没有值时,若还设置某一行Row不显示的话,就会出现异常
-            if (gvhistorydtl?.RowCount >= 0)
-                gvhistorydtl.Columns [0].Visible = false;
         }
 
         /// <summary>
@@ -557,7 +322,7 @@ namespace K3MaterialGeneralTool.UI
                 }
 
                 //最后将刷新的DT重新赋值给GridView
-                gvdtl.DataSource = tempdt;
+                gvresult.DataSource = tempdt;
                 //将“当前页”赋值给"跳转页"文本框内
                 bnPositionItem.Text = Convert.ToString(_pageCurrent);
             }
@@ -567,6 +332,5 @@ namespace K3MaterialGeneralTool.UI
             }
         }
 
-        #endregion
     }
 }

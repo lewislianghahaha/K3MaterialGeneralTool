@@ -31,6 +31,11 @@ namespace K3MaterialGeneralTool.Task
         private string _fileAddress;             //文件地址
         #endregion
 
+        #region 生成
+
+        private DataTable _importGridviewdt;     //从EXCEL导入的GridViewDT        
+        #endregion
+
         #region 返回变量
         private DataTable _resultTable;          //返回DT类型
         private bool _resultMark;                //返回是否成功标记
@@ -77,6 +82,10 @@ namespace K3MaterialGeneralTool.Task
         /// 文件地址
         /// </summary>
         public string FileAddress { set { _fileAddress = value; } }
+        /// <summary>
+        /// 从EXCEL导入的GridViewDT
+        /// </summary>
+        public DataTable ImportGridviewdt { set { _importGridviewdt = value; } }
         #endregion
 
         #region Get(返回值至外部)
@@ -173,8 +182,14 @@ namespace K3MaterialGeneralTool.Task
             _resultTable = import.ImportExcelToDt(_fileAddress);
         }
 
-        //todo:生成
-
+        /// <summary>
+        /// 生成
+        /// </summary>
+        /// <returns></returns>
+        public bool GenerateRecord()
+        {
+           return _resultMark = generate.GenerateAndCreateK3NewMaterialRecord(_importGridviewdt);
+        }
 
         #endregion
 

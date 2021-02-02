@@ -1,5 +1,4 @@
 ﻿using System;
-using NPOI.SS.Formula.Functions;
 
 namespace K3MaterialGeneralTool.DB
 {
@@ -367,7 +366,8 @@ namespace K3MaterialGeneralTool.DB
         public string Get_SearchTop1MaterialRecord(string bin,string kui)
         {
             _result = $@"
-                            SELECT TOP 1 A.FMATERIALID,A.FNUMBER,A.F_YTC_ASSISTANT7,B.FSPECIFICATION FROM dbo.T_BD_MATERIAL A
+                            SELECT TOP 1 A.FMATERIALID,A.FNUMBER,A.F_YTC_ASSISTANT7,B.FSPECIFICATION 
+                            FROM dbo.T_BD_MATERIAL A
                             INNER JOIN dbo.T_BD_MATERIAL_L B ON A.FMATERIALID=B.FMATERIALID AND B.FLOCALEID=2052
                             WHERE B.FSPECIFICATION='{kui}'
                             AND A.F_YTC_ASSISTANT7=(
@@ -816,6 +816,43 @@ namespace K3MaterialGeneralTool.DB
                                 ";
                     break;
             }
+            return _result;
+        }
+
+        /// <summary>
+        /// 创建(更新)T_BAS_BILLCODES(编码规则最大编码表)中的相关记录
+        /// 注:传输过来的物料编码只截取前8位（0~7）并且传过来的值必须为HAHAHAHA{{{{{0}}} 这种格式
+        /// </summary>
+        /// <param name="fmaterialnumber"></param>
+        /// <returns></returns>
+        public string Get_MakeUnitKey(string fmaterialnumber)
+        {
+            _result = $@"
+                            IF NOT EXISTS (SELECT 1 FROM T_BAS_BILLCODES WHERE (FRULEID = 'eeb39bd33e0441d789661e1a7e8944f0' AND FBYVALUE = N'{fmaterialnumber}'))
+                            BEGIN
+                            INSERT INTO T_BAS_BILLCODES SELECT ISNULL(max(fcodeid), 0) + 1, 'eeb39bd33e0441d789661e1a7e8944f0', N'{fmaterialnumber}', 1.0000000000 FROM T_BAS_BILLCODES
+                            END
+                            ELSE
+                            BEGIN
+                            UPDATE T_BAS_BILLCODES SET FNUMMAX = (FNUMMAX + 1.0000000000) WHERE (FRULEID = 'eeb39bd33e0441d789661e1a7e8944f0' AND FBYVALUE = N'{fmaterialnumber}')
+                            END;
+                        ";
+            return _result;
+        }
+
+        /// <summary>
+        /// 根据物料编码在‘编码索引表’内查询出FNUMMAX值,以此构建‘物料单位换算’中FBILLNO的组成部份
+        /// 注:传输过来的物料编码只截取前8位（0~7） 并且传过来的值必须为HAHAHAHA{{{{{0}}} 这种格式
+        /// </summary>
+        /// <param name="fmaterialnumber"></param>
+        /// <returns></returns>
+        public string SearchUnitMaxKey(string fmaterialnumber)
+        {
+            _result = $@"
+                            SELECT A.FNUMMAX FROM dbo.T_BAS_BILLCODES A
+                            WHERE A.FRULEID='eeb39bd33e0441d789661e1a7e8944f0'
+                            AND A.FBYVALUE='{fmaterialnumber}'
+                        ";
             return _result;
         }
 

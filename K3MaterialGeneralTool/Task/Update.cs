@@ -16,10 +16,10 @@ namespace K3MaterialGeneralTool.Task
         /// </summary>
         /// <param name="exceid"></param>
         /// <param name="k3Id"></param>
-        public void UpdateBindRecord(int exceid,int k3Id)
+        public bool UpdateBindRecord(int exceid,int k3Id)
         {
             _sqlscript = sqlList.Update_Bind(exceid, k3Id);
-            search.UseSqlSearchIntoDt(1,_sqlscript);
+            return search.Generdt(1,_sqlscript);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace K3MaterialGeneralTool.Task
             try
             {
                 _sqlscript = sqlList.Update_RemoveBind(exceid, k3Id, fid);
-                search.UseSqlSearchIntoDt(1, _sqlscript);
+                result=search.Generdt(1, _sqlscript);
             }
             catch (Exception)
             {

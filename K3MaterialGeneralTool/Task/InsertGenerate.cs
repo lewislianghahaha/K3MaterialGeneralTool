@@ -38,7 +38,7 @@ namespace K3MaterialGeneralTool.Task
                 //执行插入操作
                 ImportDtToDb("T_MAT_BindRecord", bintempdt);
                 //完成后执行对T_MAT_BindExcelCol T_MAT_BindK3Col表中的BindId字段更新
-                update.UpdateBindRecord(exceid,k3Id);
+                result = update.UpdateBindRecord(exceid,k3Id);
             }
             catch (Exception)
             {
@@ -110,6 +110,33 @@ namespace K3MaterialGeneralTool.Task
             }
             return result;
         }
+
+        #region 生成K3新物料相关
+
+        /// <summary>
+        /// 生成K3新物料
+        /// </summary>
+        /// <param name="importdt"></param>
+        /// <returns></returns>
+        public bool GenerateAndCreateK3NewMaterialRecord(DataTable importdt)
+        {
+            var result = true;
+            try
+            {
+                //
+
+            }
+            catch (Exception)
+            {
+                result = false;
+            }
+
+            return result;
+        }
+
+
+
+        #endregion
 
         /// <summary>
         /// 针对指定表进行数据插入
