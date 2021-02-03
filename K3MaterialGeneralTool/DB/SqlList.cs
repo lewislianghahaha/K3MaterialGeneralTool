@@ -1,4 +1,5 @@
 ﻿using System;
+using NPOI.SS.Formula.Functions;
 
 namespace K3MaterialGeneralTool.DB
 {
@@ -321,6 +322,39 @@ namespace K3MaterialGeneralTool.DB
         #region 生成新物料相关
 
         /// <summary>
+        /// 根据指定条件查询出“U订货商品分类”ERPcode信息
+        /// </summary>
+        /// <param name="oneLeverName">一级商品分类</param>
+        /// <param name="twoLeverName">二级商品分类</param>
+        /// <param name="dtlname">三级商品分类</param>
+        /// <returns></returns>
+        public string Get_SearchUProdceType(string oneLeverName,string twoLeverName,string dtlname)
+        {
+            if (oneLeverName != "" && twoLeverName != "" && dtlname == "")
+            {
+                _result = $@"
+                            SELECT B.ErpCode FROM dbo.T_MAT_UProductType A
+                            INNER JOIN dbo.T_MAT_UProductTypeDtl B ON A.FId=B.Fid AND b.FParentId=0
+                            WHERE A.FName='{oneLeverName}'   --百乐高
+                            AND b.FName='{twoLeverName}'     --辅料系列
+                        ";
+            }
+            else if (oneLeverName != "" && twoLeverName != "" && dtlname != "")
+            {
+                _result = $@"
+                            SELECT C.ErpCode FROM dbo.T_MAT_UProductType A
+                            INNER JOIN dbo.T_MAT_UProductTypeDtl B ON A.FId=B.Fid AND b.FParentId=0
+                            INNER JOIN dbo.T_MAT_UProductTypeDtl C ON B.Dtlid=C.FParentId 
+                            WHERE A.FName='{oneLeverName}'   --百乐高
+                            AND b.FName='{twoLeverName}'     --辅料系列
+                            AND c.FName='{dtlname}'          --PC-底漆类
+                        ";
+            }
+
+            return _result;
+        }
+
+        /// <summary>
         /// 获取原漆K3记录(创建新物料时使用)
         /// </summary>
         /// <param name="fname"></param>
@@ -624,7 +658,7 @@ namespace K3MaterialGeneralTool.DB
         }
 
         /// <summary>
-        /// 1)根据fmaterialid查询出数据源 2)用于动态生成临时表(最后更新及插入使用)
+        /// 作用:1)根据fmaterialid查询出数据源 2)用于动态生成临时表(最后更新及插入使用)此点只适合T_BD_UNITCONVERTRATE使用
         /// </summary>
         /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
         ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 

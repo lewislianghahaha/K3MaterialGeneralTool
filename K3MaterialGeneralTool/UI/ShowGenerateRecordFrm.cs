@@ -61,13 +61,25 @@ namespace K3MaterialGeneralTool.UI
                 gvresult.DataSource = GlobalClasscs.RDt.Resultdt;
                 panel5.Visible = false;
             }
-            //todo:动态改变GridView列名
-
+            //动态改变GridView列名
+            ChangeGridViewColName();
             //控制GridView单元格显示方式及转换列名
             ControlGridViewisShow();
         }
 
-
+        /// <summary>
+        /// 动态改变GridView列名
+        /// </summary>
+        private void ChangeGridViewColName()
+        {
+            gvresult.Columns[1].HeaderText = $"物料编码";  //FMaterialCode
+            gvresult.Columns[2].HeaderText = $"物料名称";  //FMaterialName
+            gvresult.Columns[3].HeaderText = $"品牌";      //FBi
+            gvresult.Columns[4].HeaderText = $"规格型号";  //FKui
+            gvresult.Columns[5].HeaderText = $"是否成功";  //Finishid
+            gvresult.Columns[6].HeaderText = $"异常原因";  //FRmark
+            gvresult.Columns[7].HeaderText = $"导入时间";  //ImportDt
+        }
 
         /// <summary>
         /// 控制GridView单元格显示方式

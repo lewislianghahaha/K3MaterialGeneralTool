@@ -119,6 +119,19 @@ namespace K3MaterialGeneralTool.Task
         #region 生成时所需相关方法
 
         /// <summary>
+        /// 根据指定条件查询出“U订货商品分类”ERPcode信息
+        /// </summary>
+        /// <param name="oneLeverName">一级商品分类</param>
+        /// <param name="twoLeverName">二级商品分类</param>
+        /// <param name="dtlname">三级商品分类</param>
+        /// <returns></returns>
+        public DataTable SearchUProdceType(string oneLeverName, string twoLeverName, string dtlname)
+        {
+            _sqlscript = sqlList.Get_SearchUProdceType(oneLeverName,twoLeverName,dtlname);
+            return UseSqlSearchIntoDt(1,_sqlscript);
+        }
+
+        /// <summary>
         /// 获取原漆K3记录(创建新物料时使用)
         /// </summary>
         /// <param name="fname"></param>
