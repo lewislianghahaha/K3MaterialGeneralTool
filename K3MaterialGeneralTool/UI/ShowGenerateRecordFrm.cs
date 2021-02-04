@@ -2,11 +2,14 @@
 using System.Data;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using K3MaterialGeneralTool.DB;
 
 namespace K3MaterialGeneralTool.UI
 {
     public partial class ShowGenerateRecordFrm : Form
     {
+        TempDtList tempDtList=new TempDtList();
+
         #region 参数定义
         //保存查询出来的GridView记录
         private DataTable _dtl;
@@ -45,7 +48,8 @@ namespace K3MaterialGeneralTool.UI
             //将生成后的结果集赋值给_dtl,并触发相关TAB CONTROL方法
             if (GlobalClasscs.RDt.Resultdt.Rows.Count>0)
             {
-                _dtl = GlobalClasscs.RDt.Resultdt;
+                //动态修正GlobalClasscs.RDt.Resultdt传送过来的内容;主要是对“是否成功”项进行修改;0:是 1:否
+                _dtl = ChangeGridViewRecord(GlobalClasscs.RDt.Resultdt);
                 panel5.Visible = true;
                 //初始化下拉框所选择的默认值
                 tmshowrows.SelectedItem = Convert.ToInt32(tmshowrows.SelectedItem) == 0
@@ -65,6 +69,34 @@ namespace K3MaterialGeneralTool.UI
             ChangeGridViewColName();
             //控制GridView单元格显示方式及转换列名
             ControlGridViewisShow();
+        }
+
+        /// <summary>
+        /// 动态修正GlobalClasscs.RDt.Resultdt传送过来的内容;主要是对“是否成功”项进行修改;0:是 1:否
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private DataTable ChangeGridViewRecord(DataTable dt)
+        {
+            //获取历史记录表临时表
+            var tempdt = tempDtList.CreateResultRecordTempdt();
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                var newrow = tempdt.NewRow();
+                for (var j = 0; j < dt.Columns.Count; j++)
+                {
+                    if (j == 5)
+                    {
+                        newrow[j] = Convert.ToInt32(dt.Rows[i][j]) == 0 ? "是" : "否";
+                    }
+                    else
+                    {
+                        newrow[j] = dt.Rows[i][j];
+                    }
+                }
+                tempdt.Rows.Add(newrow);
+            }
+            return tempdt;
         }
 
         /// <summary>

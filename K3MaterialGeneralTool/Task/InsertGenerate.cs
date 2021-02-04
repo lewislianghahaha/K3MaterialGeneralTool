@@ -141,13 +141,16 @@ namespace K3MaterialGeneralTool.Task
                 foreach (DataRow rows in importdt.Rows)
                 {
                     //根据‘品牌’及‘规格型号’获取K3物料中TOP 1的Fmaterialid(注:若此没有记录,即马上跳出当前循环)
-                    var oldmaterialid = search.SearchTop1MaterialRecord(Convert.ToString(rows[0]),Convert.ToString(rows[4]));
-                    if (oldmaterialid == 0)
+                    var searchdt = search.SearchTop1MaterialRecord(Convert.ToString(rows[0]),Convert.ToString(rows[4]));
+
+                    if (searchdt.Rows.Count==0)
                     {
-                        CreateGenerateRecord(rows, 1, $@"没有在K3中找到品牌:'{Convert.ToString(rows[0])}'及规格型号:'{Convert.ToString(rows[4])}'的相关记录,
-                                                         故不能自动生成新物料,请在K3进行手动创建");
+                        CreateGenerateRecord(rows, 1, $@"没有在K3中找到品牌:'{Convert.ToString(rows[0])}'及规格型号:'{Convert.ToString(rows[4])}'的相关记录,故不能自动生成新物料,请在K3进行手动创建");
                         continue;
                     }
+                    //若searchdt有值,即将fmaterial赋值给oldmaterialid
+                    var oldmaterialid = Convert.ToInt32(searchdt.Rows[0][0]);
+
                     //创建EXCEL临时表并将rows记录插入其中
                     var exceltempdt = ImportExcelTempdt(rows);
 
@@ -263,13 +266,12 @@ namespace K3MaterialGeneralTool.Task
             //创建EXCEL临时表
             var tempdt = tempDtList.MakeImportTempDt();
             //循环将rows记录插入至tempdt对应的项内
+            var newrow = tempdt.NewRow();
             for (var i = 0; i < tempdt.Columns.Count; i++)
             {
-                var newrow = tempdt.NewRow();
                 newrow[i] = rows[i];
-                tempdt.Rows.Add(newrow);
             }
-
+            tempdt.Rows.Add(newrow);
             return tempdt;
         }
 
@@ -329,7 +331,7 @@ namespace K3MaterialGeneralTool.Task
                 newrow[10] = 1;                               //FCREATEORGID
                 newrow[11] = 1;                               //FUSEORGID
                 newrow[12] = 100005;                          //FCREATORID(创建者)
-                newrow[13] =DateTime.Now.Date;                //FCREATEDATE
+                newrow[13] = DateTime.Now.Date;               //FCREATEDATE
                 newrow[14] = 100005;                          //FMODIFIERID(修改者)
                 newrow[15] = DateTime.Now.Date;               //FMODIFYDATE
                 newrow[16] = 100005;                          //FAPPROVERID(审核者)
@@ -377,10 +379,14 @@ namespace K3MaterialGeneralTool.Task
                         //分别将keyid(本表新主键) newmaterialid(对应T_BD_MATERIAL新主键)进行赋值
                         if (dtname == "T_BD_MATERIAL")
                         {
-                            if (j == 0)
+                            switch (j)
                             {
-                                newrow[j] = keyid;
-                                continue;
+                                case 0:
+                                    newrow[j] = keyid;
+                                    continue;
+                                case 4:
+                                    newrow[j] = keyid;
+                                    continue;
                             }
                         }
                         else if(dtname != "T_BD_MATERIAL")
@@ -396,10 +402,55 @@ namespace K3MaterialGeneralTool.Task
                             }
                         }
 
-                        //将K3列名 K3表名 exceltempdt bindt放到GetValue()内
-                        var colvalue = GetColValue(k3Colname, dtname, Convert.ToString(mdt.Rows[i][j]), exceltempdt, binddt);
-                        //将tempdt的新列插入对应的值
-                        newrow[j] = colvalue;
+                        //使用k3Colname及k3Tablename查询是否有绑定关系;若有就获取对应的值;若没有将使用旧记录赋值给对应的项内
+                        //根据k3Colname及k3Tablename查在bindt内找出对应的‘Excel字段名称’
+                        var dtlrows = binddt.Select("K3列名='" + k3Colname + "' and K3表名='" + dtname + "'");
+
+                        if (dtlrows.Length > 0)
+                        {
+                            //若dtlrows有值,即将其赋给excelcolname变量内
+                            var excelcolname = Convert.ToString(dtlrows[0][3]);
+                            //根据excelcolname找到excedt对应列的内容
+                            var excelcolvalue = Convert.ToString(exceltempdt.Rows[0][$"{excelcolname}"]);
+                            //根据excelcolname 及 excelcolvalue进行逻辑判断,并将结果返回至result变量内(重)
+                            var colvalue = CheckAndGetColValue(excelcolname, excelcolvalue);
+                            
+                            //按不同绑定字段情况进行数据类型转换(注:主要将不为string的数据类型进行转换)
+                            if (k3Colname == "F_YTC_BASE" || k3Colname=="F_YTC_BASE2" || k3Colname=="F_YTC_BASE3" || k3Colname=="FMATERIALGROUP" ||
+                                k3Colname=="FCATEGORYID" || k3Colname=="FTAXRATEID" || k3Colname=="FBASEUNITID" || k3Colname=="FSTOREUNITID" ||
+                                k3Colname=="FSALEUNITID" || k3Colname=="FSALEPRICEUNITID")
+                            {
+                                newrow[j] = Convert.ToInt32(colvalue);
+                            }
+                            else if (k3Colname=="F_YTC_DECIMAL" || k3Colname=="FNETWEIGHT")
+                            {
+                                newrow[j] = Convert.ToDecimal(colvalue);
+                            }
+                            else
+                            {
+                                newrow[j] = colvalue;
+                            }
+                        }
+                        else
+                        {
+                            //若K3字段不包含 FCREATORID FCREATEDATE FMODIFYDATE FDOCUMENTSTATUS,就将旧记录赋给临时表对应的项内
+                            switch (k3Colname)
+                            {
+                                case "FCREATORID":
+                                    newrow[j] = 100005;  //创建者ID
+                                    break;
+                                case "FCREATEDATE":
+                                case "FMODIFYDATE":
+                                    newrow[j] = DateTime.Now.Date;
+                                    break;
+                                case "FDOCUMENTSTATUS":
+                                    newrow[j] = "A";     //单据状态:创建
+                                    break;
+                                default:
+                                    newrow[j] = mdt.Rows[i][j];
+                                    break;
+                            }
+                        }
                     }
                     tempdt.Rows.Add(newrow);
                 }
@@ -410,56 +461,6 @@ namespace K3MaterialGeneralTool.Task
             catch (Exception)
             {
                 result = false;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// 根据相关条件获取对应的值
-        /// 思路:通过k3Colname k3Tablename放到binddt内查找对应的'Excel字段名称',然后再使用找出的'字段名称'在excedt查找出对应的值,
-        ///     最后根据‘Excel字段名称’‘对应的值’放到对应的方法内获取;若没有查到‘Excel字段名称’,就取k3Value作为返回值
-        /// </summary>
-        /// <param name="k3Colname">k3列名</param>
-        /// <param name="k3Tablename">k3表名</param>
-        /// <param name="k3Value">k3列旧记录(注:当没有查询到绑定关系记录时使用;将此值赋给result变量返回)</param>
-        /// <param name="excedt">导入EXCEL临时表</param>
-        /// <param name="binddt">绑定记录临时表</param>
-        /// <returns></returns>
-        private string GetColValue(string k3Colname,string k3Tablename,string k3Value,DataTable excedt,DataTable binddt)
-        {
-            string result;
-
-            //根据k3Colname及k3Tablename查在bindt内找出对应的‘Excel字段名称’
-            var dtlrows = binddt.Select("K3列名='" + k3Colname + "' and K3表名='" + k3Tablename + "'");
-            var excelcolname = Convert.ToString(dtlrows[0][3]);
-            //判断若excelname不为空,即以此为条件在excedt内查找出对应的值;反之使用k3Value
-            if (!string.IsNullOrEmpty(excelcolname))
-            {
-                //根据excelcolname找到excedt对应列的内容
-                var excelcolvalue = Convert.ToString(excedt.Rows[0][$"{excelcolname}"]);
-                //根据excelcolname 及 excelcolvalue进行逻辑判断,并将结果返回至result变量内(重)
-                result = CheckAndGetColValue(excelcolname,excelcolvalue);
-            }
-            else
-            {
-                //若K3字段不包含 FCREATORID FCREATEDATE FMODIFYDATE FDOCUMENTSTATUS,就直接取k3Value
-                if (k3Colname == "FCREATORID")
-                {
-                    result = "100005";  //创建者ID
-                }
-                else if (k3Colname == "FCREATEDATE" || k3Colname== "FMODIFYDATE")
-                {
-                    result = Convert.ToString(DateTime.Now.Date, CultureInfo.InvariantCulture);
-                }
-                else if (k3Colname == "FDOCUMENTSTATUS")
-                {
-                    result = "A";     //单据状态:创建
-                }
-                else
-                {
-                    result = k3Value;
-                }
             }
 
             return result;
@@ -480,15 +481,15 @@ namespace K3MaterialGeneralTool.Task
             if (excecolname.Contains("原漆物料名称"))
             {
                 var dt = search.SearchK3BinRecord(excecolvalue);
-                result = dt.Rows.Count > 1 ? null : Convert.ToString(dt.Rows[0][0]);
+                result = dt.Rows.Count > 1 ? Convert.ToString(DBNull.Value, CultureInfo.InvariantCulture) : Convert.ToString(dt.Rows[0][0]);
             }
             //若excecolname包含0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
             //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位,就跳转至SearchSourceRecord()方法
             else if (excecolname.Contains("品牌") || excecolname.Contains("分类") || excecolname.Contains("品类") ||excecolname.Contains("组份") || 
                     excecolname.Contains("干燥性") || excecolname.Contains("常规/订制") || excecolname.Contains("阻击产品") || excecolname.Contains("颜色") || 
                     excecolname.Contains("系数") || excecolname.Contains("水性油性") || excecolname.Contains("原漆半成品属性") || excecolname.Contains("开票信息") || 
-                    excecolname.Contains("研发类别") || excecolname.Contains("包装罐(包装箱)") || excecolname.Contains("物料分组(辅助)") || excecolname.Contains("物料分组") || 
-                    excecolname.Contains("存货类别") || excecolname.Contains("默认税率") || excecolname.Contains("基本单位"))
+                    excecolname.Contains("研发类别") || excecolname.Contains("包装罐") || excecolname.Contains("包装箱") || excecolname.Contains("物料分组(辅助)") || 
+                    excecolname.Contains("物料分组") || excecolname.Contains("存货类别") || excecolname.Contains("默认税率") || excecolname.Contains("基本单位"))
             {
                 var typeid = 0;
 
@@ -545,7 +546,11 @@ namespace K3MaterialGeneralTool.Task
                 {
                     typeid = 12;
                 }
-                else if (excecolname.Contains("包装罐(包装箱)"))
+                else if (excecolname.Contains("包装罐"))
+                {
+                    typeid = 13;
+                }
+                else if (excecolname.Contains("包装箱"))
                 {
                     typeid = 13;
                 }
@@ -571,7 +576,8 @@ namespace K3MaterialGeneralTool.Task
                 }
                 #endregion
 
-                result = search.SearchSourceRecord(typeid, excecolvalue);
+                var dt = search.SearchSourceRecord(typeid, excecolvalue);
+                result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : Convert.ToString(DBNull.Value, CultureInfo.InvariantCulture);
             }
             //若excecolname包含'U订货商品分类',即调用XXX方法;注:若返回结果多于1行,即返回null值至result变量
             else if (excecolname.Contains("U订货商品分类"))
@@ -604,9 +610,9 @@ namespace K3MaterialGeneralTool.Task
                     }
                     
 
-                    //将值赋给SearchUProdceType()
+                    //将值赋给SearchUProdceType(),并返回相关值;注:若返回的行数超过1行,即返回null值
                     var dt = search.SearchUProdceType(oneLeverName, twoLeverName, dtlname);
-                    result = dt.Rows.Count > 1 ? null : Convert.ToString(dt.Rows[0][0]);
+                    result = dt.Rows.Count > 1 ? "" : Convert.ToString(dt.Rows[0][0]);
                 }
             }
             //若excecolname不包含上面所指三种情况,即将excecolvalue值赋给result变量

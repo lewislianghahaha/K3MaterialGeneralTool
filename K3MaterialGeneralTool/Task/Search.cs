@@ -149,10 +149,10 @@ namespace K3MaterialGeneralTool.Task
         ///13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位)</param>
         /// <param name="fname">名称</param>
         /// <returns>近回ID值</returns>
-        public string SearchSourceRecord(int typeid, string fname)
+        public DataTable SearchSourceRecord(int typeid, string fname)
         {
             _sqlscript = sqlList.Get_SearchSourceRecord(typeid, fname);
-            return Convert.ToString(UseSqlSearchIntoDt(1, _sqlscript).Rows[0][0]);
+            return UseSqlSearchIntoDt(1, _sqlscript);
         }
 
         /// <summary>
@@ -161,10 +161,10 @@ namespace K3MaterialGeneralTool.Task
         /// <param name="bin">品牌名称</param>
         /// <param name="kui">规格型号</param>
         /// <returns></returns>
-        public int SearchTop1MaterialRecord(string bin, string kui)
+        public DataTable SearchTop1MaterialRecord(string bin, string kui)
         {
             _sqlscript = sqlList.Get_SearchTop1MaterialRecord(bin, kui);
-            return Convert.ToInt32(UseSqlSearchIntoDt(0, _sqlscript).Rows[0][0]);
+            return UseSqlSearchIntoDt(0, _sqlscript);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace K3MaterialGeneralTool.Task
         }
 
         /// <summary>
-        /// 1)根据fmaterialid查询出数据源 2)用于动态生成临时表(最后更新及插入使用)
+        /// 1)根据fmaterialid查询出数据源 2)用于动态生成临时表(最后更新及插入使用)此点只适合T_BD_UNITCONVERTRATE使用
         /// </summary>
         /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
         ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
