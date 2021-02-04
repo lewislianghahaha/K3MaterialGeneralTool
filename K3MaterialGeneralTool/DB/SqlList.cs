@@ -848,6 +848,7 @@ namespace K3MaterialGeneralTool.DB
                                            FFORBIDDERID ,FFORBIDDATE ,FDOCUMENTSTATUS ,
                                            FFORBIDSTATUS ,FUNITID 
                                     FROM dbo.T_BD_UNITCONVERTRATE
+                                    WHERE 1=0    --只获取其表结构不获取内容
                                 ";
                     break;
             }
@@ -880,11 +881,12 @@ namespace K3MaterialGeneralTool.DB
         /// 注:传输过来的物料编码只截取前8位（0~7） 并且传过来的值必须为HAHAHAHA{{{{{0}}} 这种格式
         /// </summary>
         /// <param name="fmaterialnumber"></param>
-        /// <returns></returns>
+        /// <returns>返回的结果为0000这种格式;如"0001"</returns>
         public string SearchUnitMaxKey(string fmaterialnumber)
         {
             _result = $@"
-                            SELECT A.FNUMMAX FROM dbo.T_BAS_BILLCODES A
+                            SELECT right(cast(power(10,4) as varchar)+CAST(a.FNUMMAX AS int),4) FNUMMAX
+                            FROM dbo.T_BAS_BILLCODES A
                             WHERE A.FRULEID='eeb39bd33e0441d789661e1a7e8944f0'
                             AND A.FBYVALUE='{fmaterialnumber}'
                         ";

@@ -288,7 +288,7 @@ namespace K3MaterialGeneralTool.DB
         /// <returns></returns>
         public DataTable CreateK3ImportTempDt(int typeid)
         {
-            var dt = searchDb.Get_SearchMaterialSourceAndCreateTemp(typeid,0).Clone();
+            var dt = searchDb.Get_SearchMaterialSourceAndCreateTemp(typeid,0);
             return dt;
         }
 

@@ -213,10 +213,10 @@ namespace K3MaterialGeneralTool.Task
         /// </summary>
         /// <param name="fmaterialnumber"></param>
         /// <returns></returns>
-        public DataTable SearchUnitMaxKey(string fmaterialnumber)
+        public string SearchUnitMaxKey(string fmaterialnumber)
         {
             _sqlscript = sqlList.SearchUnitMaxKey(fmaterialnumber);
-            return UseSqlSearchIntoDt(0, _sqlscript);
+            return Convert.ToString(UseSqlSearchIntoDt(0, _sqlscript).Rows[0][0]);
         }
 
         /// <summary>

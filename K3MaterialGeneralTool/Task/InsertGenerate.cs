@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using K3MaterialGeneralTool.DB;
 
@@ -147,7 +148,7 @@ namespace K3MaterialGeneralTool.Task
                                                          故不能自动生成新物料,请在K3进行手动创建");
                         continue;
                     }
-                    //获取EXCEL临时表并将rows记录插入其中
+                    //创建EXCEL临时表并将rows记录插入其中
                     var exceltempdt = ImportExcelTempdt(rows);
 
                     //若找到oldmaterialid相关值,即获取关于此oldmaterialid的相关表格信息
@@ -156,7 +157,7 @@ namespace K3MaterialGeneralTool.Task
                     {
                         //根据循环的i值及oldmaterialid获取数据源
                         var materialdt = search.Get_SearchMaterialSourceAndCreateTemp(i, oldmaterialid);
-                        //根据materialdt动态生成对应表格的临时表结构
+                        //根据materialdt动态生成对应表格的临时表
                         var tempdt = materialdt.Clone();
                         //根据循环的i值获取对应K3表的KEY主键值
                         var keyid = search.MakeDtidKey(i);
@@ -285,35 +286,64 @@ namespace K3MaterialGeneralTool.Task
             //获取‘单位换算’临时表
             var tempdt = tempDtList.CreateK3ImportTempDt(12);
 
-            //循环将值插入至临时表(固定插入两行)
+            //循环将相关值插入至临时表(固定插入两行)
             for (var i = 0; i < 2; i++)
             {
-                //根据循环的i值获取对应K3表的KEY主键值
+                //获取‘单位换算’新主键值
                 var unitid = search.MakeDtidKey(12);
 
-                //todo:将‘物料编码’截图前8位
+                //将‘物料编码’截图前8位+{{{{{0}}}结合
+                var materialcode = excelmatcode.Substring(0, 7);
+                var checkvalue = materialcode + "{{{{{0}}}";
 
+                //创建(更新)T_BAS_BILLCODES(编码规则最大编码表)中的相关记录-FBILLNO字段使用
+                search.Get_MakeUnitKey(checkvalue);
 
-                //todo：创建(更新)T_BAS_BILLCODES(编码规则最大编码表)中的相关记录-FBILLNO字段使用
+                //根据物料编码在‘编码索引表’内查询出FNUMMAX值,以此构建‘物料单位换算’中FBILLNO的组成部份
+                var nummax = search.SearchUnitMaxKey(checkvalue);
 
+                //将‘物料编码’截图前8位+‘编码索引表’内查询出FNUMMAX值,整合成新的FBILLNO值
+                var fbillno = materialcode + nummax;
 
-                //todo:根据物料编码在‘编码索引表’内查询出FNUMMAX值,以此构建‘物料单位换算’中FBILLNO的组成部份
+                //根据salesunit判断并获取FCURRENTUNITID最终值
+                //注:1)i=0时,再进行判断,当salesunit=10099(升)或100157(罐)就统称为罐,其余的情况直接赋值
+                var currentunitid = salesunit == 10099 || salesunit == 100157 ? 100157 : salesunit;
 
+                //获取‘规格型号’内的数值,作为‘分子’的值
+                var r = new Regex(@"\d*\.\d*|0\.\d*[1-9]\d*$");
 
-                //todo:将‘物料编码’截图前8位+‘编码索引表’内查询出FNUMMAX值,整合成新的FBILLNO值
+                var fenzi = r.Match(kui).Value;
 
-
-                //
-
-                //插入相关值至对应项内
+                //插入相关值至对应项内(共23项)
                 var newrow = tempdt.NewRow();
-                //
-                //
-                //
-                //
+                newrow[0] = unitid;                           //FUNITCONVERTRATEID
+                newrow[1] = newmaterialid;                    //FMASTERID
+                newrow[2] = fbillno;                          //FBILLNO
+                newrow[3] = "BD_MATERIALUNITCONVERT";         //FFORMID
+                newrow[4] = newmaterialid;                    //FMATERIALID
+                newrow[5] = i == 0 ? currentunitid : 10095;   //FCURRENTUNITID(单位)
+                newrow[6] = 10099;                            //FDESTUNITID(基本单位;固定:升10099)
+                newrow[7] = 0;                                //FCONVERTTYPE
+                newrow[8] = fenzi;                            //FCONVERTNUMERATOR(分子)
+                newrow[9] = i == 0 ? 1 : nkg;                 //FCONVERTDENOMINATOR(换算关系)
+                newrow[10] = 1;                               //FCREATEORGID
+                newrow[11] = 1;                               //FUSEORGID
+                newrow[12] = 100005;                          //FCREATORID(创建者)
+                newrow[13] =DateTime.Now.Date;                //FCREATEDATE
+                newrow[14] = 100005;                          //FMODIFIERID(修改者)
+                newrow[15] = DateTime.Now.Date;               //FMODIFYDATE
+                newrow[16] = 100005;                          //FAPPROVERID(审核者)
+                newrow[17] = DateTime.Now.Date;               //FAPPROVEDATE
+                newrow[18] = 0;                               //FFORBIDDERID
+                newrow[19] = DateTime.Now.Date;               //FFORBIDDATE
+                newrow[20] = "A";                             //FDOCUMENTSTATUS
+                newrow[21] = null;                            //FFORBIDSTATUS
+                newrow[22] = -1;                              //FUNITID
 
                 tempdt.Rows.Add(newrow);
             }
+            //最后将记录插入至T_BD_UNITCONVERTRATE数据表内
+            ImportDtToDb("T_BD_UNITCONVERTRATE", tempdt);
         }
 
         /// <summary>
@@ -438,8 +468,8 @@ namespace K3MaterialGeneralTool.Task
         /// <summary>
         /// 根据excelcolname 及 excelcolvalue进行逻辑判断,并将结果返回(重)
         /// </summary>
-        /// <param name="excecolname"></param>
-        /// <param name="excecolvalue"></param>
+        /// <param name="excecolname">Excel绑定列名</param>
+        /// <param name="excecolvalue">Excel绑定列名对应内容</param>
         /// <returns></returns>
         private string CheckAndGetColValue(string excecolname,string excecolvalue)
         {
@@ -449,7 +479,7 @@ namespace K3MaterialGeneralTool.Task
             //若excecolname包含'原漆',就跳转至SearchK3BinRecord()方法
             if (excecolname.Contains("原漆物料名称"))
             {
-                var dt=search.SearchK3BinRecord(excecolvalue);
+                var dt = search.SearchK3BinRecord(excecolvalue);
                 result = dt.Rows.Count > 1 ? null : Convert.ToString(dt.Rows[0][0]);
             }
             //若excecolname包含0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
