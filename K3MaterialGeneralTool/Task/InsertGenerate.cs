@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using K3MaterialGeneralTool.DB;
@@ -11,6 +10,11 @@ namespace K3MaterialGeneralTool.Task
     //生成新物料 插入记录
     public class InsertGenerate
     {
+        #region  参数定义
+        private int _newmaterialid = 0;    //记录新fmaterialid
+        private int _salesunit = 0;       //记录旧记录-销售.销售单位(FSALEUNITID);生成‘单位换算’表时使用
+        #endregion
+
         SqlList sqlList = new SqlList();
         Search search=new Search();
         TempDtList tempDtList=new TempDtList();
@@ -40,7 +44,7 @@ namespace K3MaterialGeneralTool.Task
                 newrow[3] = DateTime.Now.Date;  //BindDt
                 bintempdt.Rows.Add(newrow);
                 //执行插入操作
-                ImportDtToDb("T_MAT_BindRecord", bintempdt);
+                ImportDtToDb(1,"T_MAT_BindRecord", bintempdt);
                 //完成后执行对T_MAT_BindExcelCol T_MAT_BindK3Col表中的BindId字段更新
                 result = update.UpdateBindRecord(exceid,k3Id);
             }
@@ -72,7 +76,7 @@ namespace K3MaterialGeneralTool.Task
                 newrow[4] = DateTime.Now.Date;   //创建日期
                 createtempdt.Rows.Add(newrow);
                 //执行插入操作
-                ImportDtToDb("T_MAT_BindExcelCol", createtempdt);
+                ImportDtToDb(1,"T_MAT_BindExcelCol", createtempdt);
             }
             catch (Exception)
             {
@@ -106,7 +110,7 @@ namespace K3MaterialGeneralTool.Task
                     createk3Tempdt.Rows.Add(newrow);
                 }
                 //执行插入操作
-                ImportDtToDb("T_MAT_Source", createk3Tempdt);
+                ImportDtToDb(1,"T_MAT_Source", createk3Tempdt);
             }
             catch (Exception)
             {
@@ -127,8 +131,6 @@ namespace K3MaterialGeneralTool.Task
             var result = true;
             var loopmark = true;        //子循环使用(检测各表是否正常生成,若在循环返回的结果为false,即不能执行‘单位找算’相关代码)
             var dtname = string.Empty; //记录各表名信息
-            var newmaterialid = 0;    //记录新fmaterialid
-            var salesunit = 0;       //记录旧记录-销售.销售单位(FSALEUNITID);生成‘单位换算’表时使用
 
             try
             {
@@ -160,12 +162,12 @@ namespace K3MaterialGeneralTool.Task
                     {
                         //根据循环的i值及oldmaterialid获取数据源
                         var materialdt = search.Get_SearchMaterialSourceAndCreateTemp(i, oldmaterialid);
+
+                        //判断若materialdt返回的行数为0,即不用继续
+                        if(materialdt.Rows.Count==0) continue;
+
                         //根据materialdt动态生成对应表格的临时表
                         var tempdt = materialdt.Clone();
-                        //根据循环的i值获取对应K3表的KEY主键值
-                        var keyid = search.MakeDtidKey(i);
-                        //若i值为0，即获取获取的KEY值为fmaterialid
-                        if (i == 0) newmaterialid = keyid;
    
                         #region 根据循环id获取对应表信息
                             //0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale
@@ -213,13 +215,13 @@ namespace K3MaterialGeneralTool.Task
                         #endregion
 
                         //当dtname="T_BD_MATERIALSALE"时,获取materialdt.rows[0][2]的值并赋给salesunit变量;‘单位换算’表使用
-                        if (dtname == "T_BD_MATERIALSALE")
+                        if (dtname == "t_BD_MaterialSale")
                         {
-                            salesunit = Convert.ToInt32(materialdt.Rows[0][2]);
+                            _salesunit = Convert.ToInt32(materialdt.Rows[0][2]);
                         }
 
                         //将materialdt tempdt keyid放至方法内进行选择插入,并返回bool,若为false,即跳转至CreateGenerateRecord()并break,loopmark为false
-                        if (!MakeRecordToDb(materialdt, tempdt, keyid, exceltempdt, dtname, binddt,newmaterialid))
+                        if (!MakeRecordToDb(i,materialdt, tempdt, exceltempdt, dtname, binddt))
                         {
                             CreateGenerateRecord(rows,1,$@"物料编码:'{Convert.ToString(rows[1])}'不能成功插入,原因:插入'{dtname}'表时出现异常,请联系管理员");
                             loopmark = false;
@@ -231,7 +233,7 @@ namespace K3MaterialGeneralTool.Task
                     if (!loopmark)
                     {
                         //当检测到loopmark为false时,即使用keyid为条件,将已插入的表格进行删除
-                        search.DelNewMaterialRecord(newmaterialid);
+                        search.DelNewMaterialRecord(_newmaterialid);
                         continue;
                     }
                     //执行‘单位换算’表相关内容插入
@@ -239,13 +241,13 @@ namespace K3MaterialGeneralTool.Task
                     var excelmatcode = Convert.ToString(exceltempdt.Rows[0]["物料编码"]);
                     var nkg = Convert.ToDecimal(exceltempdt.Rows[0]["净重"]);
                     var kui = Convert.ToString(exceltempdt.Rows[0]["规格型号"]);
-                    MakeUnitRecordToDb(newmaterialid, salesunit, excelmatcode, nkg,kui);
+                    MakeUnitRecordToDb(_salesunit, excelmatcode, nkg,kui);
                     //最后若成功生成,并将rows插入至CreateGenerateRecord()内
                     CreateGenerateRecord(rows,0,"");
                 }
 
                 //1)将_resultdt插入T_MAT_ImportHistoryRecord表内 2) 最后将结果集添加至GlobalClasscs.RDt.Resultdt内
-                ImportDtToDb("T_MAT_ImportHistoryRecord", _resultdt);
+                ImportDtToDb(1,"T_MAT_ImportHistoryRecord", _resultdt);
                 GlobalClasscs.RDt.Resultdt = _resultdt.Copy();
             }
             catch (Exception)
@@ -278,12 +280,11 @@ namespace K3MaterialGeneralTool.Task
         /// <summary>
         /// 执行‘单位换算’表相关内容插入
         /// </summary>
-        /// <param name="newmaterialid">新fmaterialid</param>
         /// <param name="salesunit">旧记录销售单位ID</param>
         /// <param name="excelmatcode">excel物料编码</param>
         /// <param name="nkg">净重-来源excel内容</param>
         /// <param name="kui">规格型号-来源excel内容</param>
-        private void MakeUnitRecordToDb(int newmaterialid,int salesunit,string excelmatcode,decimal nkg,string kui)
+        private void MakeUnitRecordToDb(int salesunit,string excelmatcode,decimal nkg,string kui)
         {
             //获取‘单位换算’临时表
             var tempdt = tempDtList.CreateK3ImportTempDt(12);
@@ -312,54 +313,53 @@ namespace K3MaterialGeneralTool.Task
                 var currentunitid = salesunit == 10099 || salesunit == 100157 ? 100157 : salesunit;
 
                 //获取‘规格型号’内的数值,作为‘分子’的值
-                var r = new Regex(@"\d*\.\d*|0\.\d*[1-9]\d*$");
-
-                var fenzi = r.Match(kui).Value;
+                var r = new Regex(@"^-?\d+$|^(-?\d+)(\.\d+)?$");//new Regex(@"\d*\.\d*|0\.\d*[1-9]\d*$");
+                
+                var fenzi = r.Match(kui).Value; 
 
                 //插入相关值至对应项内(共23项)
                 var newrow = tempdt.NewRow();
-                newrow[0] = unitid;                           //FUNITCONVERTRATEID
-                newrow[1] = newmaterialid;                    //FMASTERID
-                newrow[2] = fbillno;                          //FBILLNO
-                newrow[3] = "BD_MATERIALUNITCONVERT";         //FFORMID
-                newrow[4] = newmaterialid;                    //FMATERIALID
-                newrow[5] = i == 0 ? currentunitid : 10095;   //FCURRENTUNITID(单位)
-                newrow[6] = 10099;                            //FDESTUNITID(基本单位;固定:升10099)
-                newrow[7] = 0;                                //FCONVERTTYPE
-                newrow[8] = fenzi;                            //FCONVERTNUMERATOR(分子)
-                newrow[9] = i == 0 ? 1 : nkg;                 //FCONVERTDENOMINATOR(换算关系)
-                newrow[10] = 1;                               //FCREATEORGID
-                newrow[11] = 1;                               //FUSEORGID
-                newrow[12] = 100005;                          //FCREATORID(创建者)
-                newrow[13] = DateTime.Now.Date;               //FCREATEDATE
-                newrow[14] = 100005;                          //FMODIFIERID(修改者)
-                newrow[15] = DateTime.Now.Date;               //FMODIFYDATE
-                newrow[16] = 100005;                          //FAPPROVERID(审核者)
-                newrow[17] = DateTime.Now.Date;               //FAPPROVEDATE
-                newrow[18] = 0;                               //FFORBIDDERID
-                newrow[19] = DateTime.Now.Date;               //FFORBIDDATE
-                newrow[20] = "A";                             //FDOCUMENTSTATUS
-                newrow[21] = null;                            //FFORBIDSTATUS
-                newrow[22] = -1;                              //FUNITID
+                newrow[0] = unitid;                                              //FUNITCONVERTRATEID
+                newrow[1] = _newmaterialid;                                      //FMASTERID
+                newrow[2] = fbillno;                                             //FBILLNO
+                newrow[3] = "BD_MATERIALUNITCONVERT";                            //FFORMID
+                newrow[4] = _newmaterialid;                                      //FMATERIALID
+                newrow[5] = i == 0 ? currentunitid : 10095;                      //FCURRENTUNITID(单位)
+                newrow[6] = 10099;                                               //FDESTUNITID(基本单位;固定:升10099)
+                newrow[7] = 0;                                                   //FCONVERTTYPE
+                newrow[8] = fenzi == "" ? (object) 0 : Convert.ToDecimal(fenzi); //FCONVERTNUMERATOR(分子)
+                newrow[9] = i == 0 ? 1 : nkg;                                    //FCONVERTDENOMINATOR(换算关系)
+                newrow[10] = 1;                                                  //FCREATEORGID
+                newrow[11] = 1;                                                  //FUSEORGID
+                newrow[12] = 100005;                                             //FCREATORID(创建者)
+                newrow[13] = DateTime.Now.Date;                                  //FCREATEDATE
+                newrow[14] = 100005;                                             //FMODIFIERID(修改者)
+                newrow[15] = DateTime.Now.Date;                                  //FMODIFYDATE
+                newrow[16] = 100005;                                             //FAPPROVERID(审核者)
+                newrow[17] = DateTime.Now.Date;                                  //FAPPROVEDATE
+                newrow[18] = 0;                                                  //FFORBIDDERID
+                newrow[19] = DateTime.Now.Date;                                  //FFORBIDDATE
+                newrow[20] = "A";                                                //FDOCUMENTSTATUS
+                newrow[21] = null;                                               //FFORBIDSTATUS
+                newrow[22] = -1;                                                 //FUNITID
 
                 tempdt.Rows.Add(newrow);
             }
             //最后将记录插入至T_BD_UNITCONVERTRATE数据表内
-            ImportDtToDb("T_BD_UNITCONVERTRATE", tempdt);
+            ImportDtToDb(0,"T_BD_UNITCONVERTRATE", tempdt);
         }
 
         /// <summary>
         /// 创建收集新记录集及插入至对应数据库(重)
         /// </summary>
+        /// <param name="tabid">表格循环ID</param>
         /// <param name="mdt">根据旧materialid获取的数据集</param>
         /// <param name="tempdt">对应的临时表(最后插入使用)</param>
-        /// <param name="keyid">对应表新主键ID</param>
         /// <param name="exceltempdt">EXCEL导入的临时表(包含循环行的内容)</param>
         /// <param name="dtname">对应表名称</param>
         /// <param name="binddt">绑定记录表</param>
-        /// <param name="newmaterialid">新materialid 插入表时要使用</param>
         /// <returns></returns>
-        private bool MakeRecordToDb(DataTable mdt, DataTable tempdt, int keyid, DataTable exceltempdt,string dtname,DataTable binddt,int newmaterialid)
+        private bool MakeRecordToDb(int tabid,DataTable mdt, DataTable tempdt,DataTable exceltempdt,string dtname,DataTable binddt)
         {
             var result = true;
 
@@ -368,6 +368,11 @@ namespace K3MaterialGeneralTool.Task
                 //循环mdt数据源-行
                 for (var i = 0; i < mdt.Rows.Count; i++)
                 {
+                    //根据循环的tabid值获取对应K3表的KEY主键值
+                    var keyid = search.MakeDtidKey(tabid);
+                    //若tabid值为0，即获取的KEY值为newfmaterialid
+                    if (tabid == 0) _newmaterialid = keyid;
+
                     //对tempdt创建行,注:因为mdt与tempdt数据结构一致,故列也是一致
                     var newrow = tempdt.NewRow();
                     //循环mdt数据源-列
@@ -397,7 +402,7 @@ namespace K3MaterialGeneralTool.Task
                                     newrow[j] = keyid;
                                     continue;
                                 case 1:
-                                    newrow[j] = newmaterialid;
+                                    newrow[j] = _newmaterialid;
                                     continue;
                             }
                         }
@@ -416,11 +421,14 @@ namespace K3MaterialGeneralTool.Task
                             var colvalue = CheckAndGetColValue(excelcolname, excelcolvalue);
                             
                             //按不同绑定字段情况进行数据类型转换(注:主要将不为string的数据类型进行转换)
-                            if (k3Colname == "F_YTC_BASE" || k3Colname=="F_YTC_BASE2" || k3Colname=="F_YTC_BASE3" || k3Colname=="FMATERIALGROUP" ||
-                                k3Colname=="FCATEGORYID" || k3Colname=="FTAXRATEID" || k3Colname=="FBASEUNITID" || k3Colname=="FSTOREUNITID" ||
-                                k3Colname=="FSALEUNITID" || k3Colname=="FSALEPRICEUNITID")
+                            if (k3Colname == "FMATERIALGROUP" || k3Colname == "FCATEGORYID" || k3Colname == "FTAXRATEID" ||
+                                k3Colname == "FBASEUNITID" || k3Colname == "FSTOREUNITID" || k3Colname == "FSALEUNITID" || k3Colname == "FSALEPRICEUNITID")
                             {
-                                newrow[j] = Convert.ToInt32(colvalue);
+                                newrow[j] = colvalue == "" ? (object)DBNull.Value : Convert.ToInt32(colvalue);
+                            }
+                            else if (k3Colname == "F_YTC_BASE" || k3Colname == "F_YTC_BASE2" || k3Colname == "F_YTC_BASE3")
+                            {
+                                newrow[j] = colvalue == "" ? 0 : Convert.ToInt32(colvalue);
                             }
                             else if (k3Colname=="F_YTC_DECIMAL" || k3Colname=="FNETWEIGHT")
                             {
@@ -436,14 +444,16 @@ namespace K3MaterialGeneralTool.Task
                             //若K3字段不包含 FCREATORID FCREATEDATE FMODIFYDATE FDOCUMENTSTATUS,就将旧记录赋给临时表对应的项内
                             switch (k3Colname)
                             {
-                                case "FCREATORID":
-                                    newrow[j] = 100005;  //创建者ID
+                                case "FCREATORID":      //创建者ID
+                                case "FMODIFIERID":     //修改者ID
+                                    newrow[j] = 100005;  
                                     break;
-                                case "FCREATEDATE":
-                                case "FMODIFYDATE":
+                                case "FCREATEDATE":     //创建日期
+                                case "FMODIFYDATE":     //修改日期
                                     newrow[j] = DateTime.Now.Date;
                                     break;
                                 case "FDOCUMENTSTATUS":
+                                case "FFORBIDSTATUS":
                                     newrow[j] = "A";     //单据状态:创建
                                     break;
                                 default:
@@ -456,10 +466,11 @@ namespace K3MaterialGeneralTool.Task
                 }
                 
                 //最后将dtname及对应的内容进行插入
-                ImportDtToDb(dtname,tempdt);
+                ImportDtToDb(0,dtname,tempdt);
             }
             catch (Exception)
             {
+                //var a = ex.Message;
                 result = false;
             }
 
@@ -478,109 +489,109 @@ namespace K3MaterialGeneralTool.Task
 
             //根据excecolname跳转至不同的方法进行获取相关ID值,若不用查找对应ID值的列,即将excecolvalue赋给result变量
             //若excecolname包含'原漆',就跳转至SearchK3BinRecord()方法
-            if (excecolname.Contains("原漆物料名称"))
+            if (excecolname == "原漆物料名称")
             {
                 var dt = search.SearchK3BinRecord(excecolvalue);
-                result = dt.Rows.Count > 1 ? Convert.ToString(DBNull.Value, CultureInfo.InvariantCulture) : Convert.ToString(dt.Rows[0][0]);
+                result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : "";
             }
             //若excecolname包含0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
             //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位,就跳转至SearchSourceRecord()方法
-            else if (excecolname.Contains("品牌") || excecolname.Contains("分类") || excecolname.Contains("品类") ||excecolname.Contains("组份") || 
-                    excecolname.Contains("干燥性") || excecolname.Contains("常规/订制") || excecolname.Contains("阻击产品") || excecolname.Contains("颜色") || 
-                    excecolname.Contains("系数") || excecolname.Contains("水性油性") || excecolname.Contains("原漆半成品属性") || excecolname.Contains("开票信息") || 
-                    excecolname.Contains("研发类别") || excecolname.Contains("包装罐") || excecolname.Contains("包装箱") || excecolname.Contains("物料分组(辅助)") || 
-                    excecolname.Contains("物料分组") || excecolname.Contains("存货类别") || excecolname.Contains("默认税率") || excecolname.Contains("基本单位"))
+            else if (excecolname == "品牌" || excecolname =="分类" || excecolname =="品类" ||excecolname =="组份" || 
+                    excecolname == "干燥性" || excecolname =="工业项目名称(常规/定制)" || excecolname =="是否为阻击产品" || excecolname == "颜色" || 
+                    excecolname =="系数" || excecolname =="水性油性" || excecolname =="原漆半成品属性" || excecolname == "开票信息" || 
+                    excecolname =="研发类别" || excecolname =="包装罐" || excecolname =="包装箱" || excecolname == "物料分组(辅助)" || 
+                    excecolname =="物料分组" || excecolname=="存货类别" || excecolname=="默认税率" || excecolname== "基本单位")
             {
                 var typeid = 0;
 
                 #region 根据不同的列名获取不同的typeid值
-                if (excecolname.Contains("品牌"))
+                if (excecolname =="品牌")
                 {
                     typeid = 0;
                 }
-                else if (excecolname.Contains("分类"))
+                else if (excecolname =="分类")
                 {
                     typeid = 1;
                 }
-                else if (excecolname.Contains("品类"))
+                else if (excecolname =="品类")
                 {
                     typeid = 2;
                 }
-                else if (excecolname.Contains("组份"))
+                else if (excecolname =="组份")
                 {
                     typeid = 3;
                 }
-                else if (excecolname.Contains("干燥性"))
+                else if (excecolname =="干燥性")
                 {
                     typeid = 4;
                 }
-                else if (excecolname.Contains("常规/订制"))
+                else if (excecolname =="工业项目名称(常规/定制)")
                 {
                     typeid = 5;
                 }
-                else if (excecolname.Contains("阻击产品"))
+                else if (excecolname =="是否为阻击产品")
                 {
                     typeid = 6;
                 }
-                else if (excecolname.Contains("颜色"))
+                else if (excecolname =="颜色")
                 {
                     typeid = 7;
                 }
-                else if (excecolname.Contains("系数"))
+                else if (excecolname =="系数")
                 {
                     typeid = 8;
                 }
-                else if (excecolname.Contains("水性油性"))
+                else if (excecolname =="水性油性")
                 {
                     typeid = 9;
                 }
-                else if (excecolname.Contains("原漆半成品属性"))
+                else if (excecolname =="原漆半成品属性")
                 {
                     typeid = 10;
                 }
-                else if (excecolname.Contains("开票信息"))
+                else if (excecolname =="开票信息")
                 {
                     typeid = 11;
                 }
-                else if (excecolname.Contains("研发类别"))
+                else if (excecolname =="研发类别")
                 {
                     typeid = 12;
                 }
-                else if (excecolname.Contains("包装罐"))
+                else if (excecolname =="包装罐")
                 {
                     typeid = 13;
                 }
-                else if (excecolname.Contains("包装箱"))
+                else if (excecolname =="包装箱")
                 {
                     typeid = 13;
                 }
-                else if (excecolname.Contains("物料分组(辅助)"))
+                else if (excecolname =="物料分组(辅助)")
                 {
                     typeid = 14;
                 }
-                else if (excecolname.Contains("物料分组"))
+                else if (excecolname =="物料分组")
                 {
                     typeid = 15;
                 }
-                else if (excecolname.Contains("存货类别"))
+                else if (excecolname =="存货类别")
                 {
                     typeid = 16;
                 }
-                else if (excecolname.Contains("默认税率"))
+                else if (excecolname =="默认税率")
                 {
                     typeid = 17;
                 }
-                else if (excecolname.Contains("基本单位"))
+                else if (excecolname =="基本单位")
                 {
                     typeid = 18;
                 }
                 #endregion
 
                 var dt = search.SearchSourceRecord(typeid, excecolvalue);
-                result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : Convert.ToString(DBNull.Value, CultureInfo.InvariantCulture);
+                result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : "";
             }
             //若excecolname包含'U订货商品分类',即调用XXX方法;注:若返回结果多于1行,即返回null值至result变量
-            else if (excecolname.Contains("U订货商品分类"))
+            else if (excecolname =="U订货商品分类")
             {
                 //定义各商品分类变量
                 var oneLeverName = string.Empty;   //一级商品分类
@@ -666,14 +677,16 @@ namespace K3MaterialGeneralTool.Task
         /// <summary>
         /// 针对指定表进行数据插入
         /// </summary>
+        /// <param name="connid">连接类型ID; 0:K3 1:Material数据库</param>
         /// <param name="tableName">表名</param>
         /// <param name="dt">包含数据的临时表</param>
-        private void ImportDtToDb(string tableName, DataTable dt)
+        private void ImportDtToDb(int connid,string tableName, DataTable dt)
         {
             try
             {
                 var conn = new Conn();
-                var sqlcon = conn.GetConnectionString(1);
+                var sqlcon = conn.GetConnectionString(connid == 0 ? 0 : 1);
+
                 // sqlcon.Open(); 若返回一个SqlConnection的话,必须要显式打开 
                 //注:1)要插入的DataTable内的字段数据类型必须要与数据库内的一致;并且要按数据表内的字段顺序 2)SqlBulkCopy类只提供将数据写入到数据库内
                 using (var sqlBulkCopy = new SqlBulkCopy(sqlcon))

@@ -429,6 +429,7 @@ namespace K3MaterialGeneralTool.DB
         {
             switch (typeid)
             {
+                //T_BD_MATERIAL
                 case 0:
                     _result = @"
                             DECLARE
@@ -445,6 +446,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //T_BD_MATERIAL_L
                 case 1:
                     _result = @"
                             DECLARE
@@ -461,6 +463,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_BD_MaterialBase
                 case 2:
                     _result = @"
                             DECLARE
@@ -477,6 +480,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_BD_MaterialStock
                 case 3:
                     _result = @"
                             DECLARE
@@ -493,6 +497,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_BD_MaterialSale
                 case 4:
                     _result = @"
                             DECLARE
@@ -509,6 +514,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_bd_MaterialPurchase
                 case 5:
                     _result = @"
                             DECLARE
@@ -525,6 +531,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_BD_MaterialPlan
                 case 6:
                     _result = @"
                             DECLARE
@@ -541,6 +548,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_BD_MaterialProduce
                 case 7:
                     _result = @"
                             DECLARE
@@ -557,55 +565,8 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_BD_MaterialAuxPty
                 case 8:
-                    _result = @"
-                            DECLARE
-	                            @id INT;
-                            BEGIN
-	                            INSERT INTO dbo.Z_BD_MATERIALINVPTY( Column1 )
-	                            VALUES  (1)
-
-	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALINVPTY
-
-	                            DELETE FROM dbo.Z_BD_MATERIALINVPTY
-
-	                            SELECT @id
-                            END
-                       ";
-                    break;
-                case 9:
-                    _result = @"
-                            DECLARE
-	                            @id INT;
-                            BEGIN
-	                            INSERT INTO dbo.Z_BD_MATERIALSUBCON( Column1 )
-	                            VALUES  (1)
-
-	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALSUBCON
-
-	                            DELETE FROM dbo.Z_BD_MATERIALSUBCON
-
-	                            SELECT @id
-                            END
-                       ";
-                    break;
-                case 10:
-                    _result = @"
-                            DECLARE
-	                            @id INT;
-                            BEGIN
-	                            INSERT INTO dbo.Z_BD_MATERIALQUALITY( Column1 )
-	                            VALUES  (1)
-
-	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALQUALITY
-
-	                            DELETE FROM dbo.Z_BD_MATERIALQUALITY
-
-	                            SELECT @id
-                            END
-                       ";
-                    break;
-                case 11:
                     _result = @"
                             DECLARE
 	                            @id INT;
@@ -621,6 +582,58 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //t_BD_MaterialInvPty
+                case 9:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALINVPTY( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALINVPTY
+
+	                            DELETE FROM dbo.Z_BD_MATERIALINVPTY
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                //t_bd_MaterialSubcon
+                case 10:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALSUBCON( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALSUBCON
+
+	                            DELETE FROM dbo.Z_BD_MATERIALSUBCON
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                //T_BD_MATERIALQUALITY
+                case 11:
+                    _result = @"
+                            DECLARE
+	                            @id INT;
+                            BEGIN
+	                            INSERT INTO dbo.Z_BD_MATERIALQUALITY( Column1 )
+	                            VALUES  (1)
+
+	                            SELECT @id=Id FROM dbo.Z_BD_MATERIALQUALITY
+
+	                            DELETE FROM dbo.Z_BD_MATERIALQUALITY
+
+	                            SELECT @id
+                            END
+                       ";
+                    break;
+                //T_BD_UNITCONVERTRATE
                 case 12:
                     _result = @"
                             DECLARE
@@ -637,6 +650,7 @@ namespace K3MaterialGeneralTool.DB
                             END
                        ";
                     break;
+                //T_MAT_ImportHistoryRecord_Key
                 case 13:
                     _result = @"
                             DECLARE
@@ -669,6 +683,7 @@ namespace K3MaterialGeneralTool.DB
         {
             switch (typeid)
             {
+                //T_BD_MATERIAL
                 case 0:
                     _result = $@"
                             SELECT FMATERIALID ,FNUMBER ,FOLDNUMBER ,FMNEMONICCODE ,FMASTERID ,
@@ -690,6 +705,7 @@ namespace K3MaterialGeneralTool.DB
                             WHERE FMATERIALID='{fmaterialid}'
                         ";
                     break;
+                //T_BD_MATERIAL_L
                 case 1:
                     _result = $@"
                             SELECT A.FPKID ,A.FMATERIALID ,A.FLOCALEID ,A.FNAME ,A.FSPECIFICATION ,
@@ -699,6 +715,7 @@ namespace K3MaterialGeneralTool.DB
                             WHERE B.FMATERIALID='{fmaterialid}'
                         ";
                     break;
+                //T_BD_MATERIALBASE
                 case 2:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FERPCLSID ,A.FCATEGORYID ,
@@ -713,6 +730,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
                                 ";
                     break;
+                //T_BD_MATERIALSTOCK
                 case 3:
                     _result = $@"
                                 SELECT A.FENTRYID ,A.FMATERIALID ,A.FSTOREUNITID ,A.FAUXUNITID ,
@@ -732,6 +750,7 @@ namespace K3MaterialGeneralTool.DB
                                 WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
+                //T_BD_MATERIALSALE
                 case 4:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FSALEUNITID ,A.FSALEPRICEUNITID ,
@@ -747,6 +766,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
                                 ";
                     break;
+                //T_BD_MATERIALPURCHASE
                 case 5:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FPURCHASEUNITID ,A.FPURCHASEPRICEUNITID ,
@@ -763,6 +783,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
+                //T_BD_MATERIALPLAN
                 case 6:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FPLANNINGSTRATEGY ,A.FORDERPOLICY ,
@@ -780,6 +801,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
+                //T_BD_MATERIALPRODUCE
                 case 7:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FWORKSHOPID ,A.FPRODUCEUNITID ,A.FBOMUNITID ,
@@ -796,6 +818,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
+                //T_BD_MATERIALAUXPTY
                 case 8:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FAUXPROPERTYID ,A.FISENABLE ,
@@ -806,6 +829,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
+                //T_BD_MATERIALINVPTY
                 case 9:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FINVPTYID ,A.FISENABLE ,
@@ -815,6 +839,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
                                 ";
                     break;
+                //T_BD_MATERIALSUBCON
                 case 10:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FSUBCONUNITID ,A.FSUBCONPRICEUNITID ,
@@ -825,6 +850,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
                                 ";
                     break;
+                //T_BD_MATERIALQUALITY
                 case 11:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FCHECKPRODUCT ,
@@ -837,6 +863,7 @@ namespace K3MaterialGeneralTool.DB
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
+                //T_BD_UNITCONVERTRATE
                 case 12:
                     _result = $@"
                                     SELECT FUNITCONVERTRATEID , FMASTERID ,FBILLNO ,

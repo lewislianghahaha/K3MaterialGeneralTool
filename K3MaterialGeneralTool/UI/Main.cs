@@ -188,6 +188,10 @@ namespace K3MaterialGeneralTool.UI
             }
             catch (Exception ex)
             {
+                var dt = (DataTable)gvdtl.DataSource;
+                dt.Rows.Clear();
+                dt.Columns.Clear();
+                gvdtl.DataSource = dt;
                 MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
