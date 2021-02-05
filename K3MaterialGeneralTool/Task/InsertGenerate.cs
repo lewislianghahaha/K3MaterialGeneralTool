@@ -286,6 +286,7 @@ namespace K3MaterialGeneralTool.Task
         /// <param name="kui">规格型号-来源excel内容</param>
         private void MakeUnitRecordToDb(int salesunit,string excelmatcode,decimal nkg,string kui)
         {
+            var fenzi = new decimal();
             //获取‘单位换算’临时表
             var tempdt = tempDtList.CreateK3ImportTempDt(12);
 
@@ -313,9 +314,9 @@ namespace K3MaterialGeneralTool.Task
                 var currentunitid = salesunit == 10099 || salesunit == 100157 ? 100157 : salesunit;
 
                 //获取‘规格型号’内的数值,作为‘分子’的值
-                var r = new Regex(@"^-?\d+$|^(-?\d+)(\.\d+)?$");//new Regex(@"\d*\.\d*|0\.\d*[1-9]\d*$");
-                
-                var fenzi = r.Match(kui).Value; 
+                var str = Regex.Replace(kui, @"[^\d.\d]", "");
+                //如果是数字，则转换为decimal类型
+                fenzi = Regex.IsMatch(str, @"^[+-]?\d*[.]?\d*$") ? decimal.Parse(str) : 0;
 
                 //插入相关值至对应项内(共23项)
                 var newrow = tempdt.NewRow();
@@ -327,7 +328,7 @@ namespace K3MaterialGeneralTool.Task
                 newrow[5] = i == 0 ? currentunitid : 10095;                      //FCURRENTUNITID(单位)
                 newrow[6] = 10099;                                               //FDESTUNITID(基本单位;固定:升10099)
                 newrow[7] = 0;                                                   //FCONVERTTYPE
-                newrow[8] = fenzi == "" ? (object) 0 : Convert.ToDecimal(fenzi); //FCONVERTNUMERATOR(分子)
+                newrow[8] = fenzi;                                               //FCONVERTNUMERATOR(分子)
                 newrow[9] = i == 0 ? 1 : nkg;                                    //FCONVERTDENOMINATOR(换算关系)
                 newrow[10] = 1;                                                  //FCREATEORGID
                 newrow[11] = 1;                                                  //FUSEORGID
@@ -340,7 +341,7 @@ namespace K3MaterialGeneralTool.Task
                 newrow[18] = 0;                                                  //FFORBIDDERID
                 newrow[19] = DateTime.Now.Date;                                  //FFORBIDDATE
                 newrow[20] = "A";                                                //FDOCUMENTSTATUS
-                newrow[21] = null;                                               //FFORBIDSTATUS
+                newrow[21] = "";                                                 //FFORBIDSTATUS
                 newrow[22] = -1;                                                 //FUNITID
 
                 tempdt.Rows.Add(newrow);

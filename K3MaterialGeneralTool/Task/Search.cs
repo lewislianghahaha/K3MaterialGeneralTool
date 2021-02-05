@@ -98,7 +98,7 @@ namespace K3MaterialGeneralTool.Task
         /// 查询历史记录
         /// </summary>
         /// <returns></returns>
-        public DataTable SearchHistoryRecord(DateTime sdt, DateTime edt, string fmaterialname, string fkui, string fbi)
+        public DataTable SearchHistoryRecord(string sdt, string edt, string fmaterialname, string fkui, string fbi)
         {
             _sqlscript = sqlList.Get_SearchHistoryRecord(sdt,edt,fmaterialname,fkui,fbi);
             return UseSqlSearchIntoDt(1, _sqlscript);

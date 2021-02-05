@@ -236,9 +236,9 @@ namespace K3MaterialGeneralTool.UI
         private void OnSearchHistory()
         {
             //获取所选择的'开始'日期
-            var sdt = dtstart.Value.Date;
+            var sdt = dtstart.Value.Date.ToShortDateString();
             //获取所选择的'结束'日期
-            var edt = dtend.Value.Date;
+            var edt = dtend.Value.Date.ToShortDateString();
             //获取‘物料名称’记录
             var materialname = txtmaterialname.Text;
             //获取‘规格型号’记录
@@ -321,7 +321,7 @@ namespace K3MaterialGeneralTool.UI
         {
             //注:当没有值时,若还设置某一行Row不显示的话,就会出现异常
             if (gvhistorydtl?.RowCount >= 0)
-                gvhistorydtl.Columns [0].Visible = false;
+                gvhistorydtl.Columns[0].Visible = false;
         }
 
         /// <summary>
@@ -561,7 +561,7 @@ namespace K3MaterialGeneralTool.UI
                 }
 
                 //最后将刷新的DT重新赋值给GridView
-                gvdtl.DataSource = tempdt;
+                gvhistorydtl.DataSource = tempdt;
                 //将“当前页”赋值给"跳转页"文本框内
                 bnPositionItem.Text = Convert.ToString(_pageCurrent);
             }

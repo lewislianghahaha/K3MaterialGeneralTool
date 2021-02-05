@@ -20,8 +20,8 @@ namespace K3MaterialGeneralTool.Task
         #endregion
 
         #region 历史记录使用
-        private DateTime _sdt;                   //开始日期
-        private DateTime _edt;                   //结束日期
+        private string _sdt;                   //开始日期
+        private string _edt;                   //结束日期
         private string _fmaterialname;           //物料名称
         private string _fkui;                    //规格型号
         private string _fbi;                     //品牌
@@ -61,11 +61,11 @@ namespace K3MaterialGeneralTool.Task
         /// <summary>
         /// 开始日期
         /// </summary>
-        public DateTime Sdt { set { _sdt = value; } }
+        public string Sdt { set { _sdt = value; } }
         /// <summary>
         /// 结束日期
         /// </summary>
-        public DateTime Edt { set { _edt = value; } }
+        public string Edt { set { _edt = value; } }
         /// <summary>
         /// 物料名称
         /// </summary>

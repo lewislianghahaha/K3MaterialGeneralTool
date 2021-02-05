@@ -961,15 +961,15 @@ namespace K3MaterialGeneralTool.DB
         /// <param name="fkui">规格型号</param>
         /// <param name="fbi">品牌</param>
         /// <returns></returns>
-        public string Get_SearchHistoryRecord(DateTime sdt,DateTime edt,string fmaterialname,string fkui,string fbi)
+        public string Get_SearchHistoryRecord(string sdt,string edt,string fmaterialname,string fkui,string fbi)
         {
                 _result = $@"
-                            SELECT A.FMaterialCode 物料编码,A.FMaerialName 物料名称,A.FBi 品牌,A.FKui 规格型号,
+                            SELECT A.FID,A.FMaterialCode 物料编码,A.FMaerialName 物料名称,A.FBi 品牌,A.FKui 规格型号,
                                    CASE A.Finishid WHEN 0 THEN '是' ELSE '否' END 是否成功,
                                    A.FRemark 异常原因,A.ImportDt 导入时间
                             FROM dbo.T_MAT_ImportHistoryRecord A
-                            WHERE (CONVERT(varchar(100), A.ImportDt, 23) >=CONVERT(VARCHAR(100),'{sdt}',23)
-							AND (CONVERT(varchar(100), A.ImportDt, 23) <=CONVERT(VARCHAR(100),'{edt}',23)
+                            WHERE (CONVERT(varchar(100), A.ImportDt, 23)) >='{sdt}'
+							AND (CONVERT(varchar(100), A.ImportDt, 23)) <='{edt}'
                             AND (A.FMaerialName like '%{fmaterialname}%' or '{fmaterialname}' is null)
                             AND (A.FKui LIKE '%{fkui}%' or '{fkui}' is null)
                             AND (A.FBi like '%{fbi}%' or '{fbi}' is null)
