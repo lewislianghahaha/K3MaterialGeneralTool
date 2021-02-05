@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BinColFrm));
             this.Menu = new System.Windows.Forms.MenuStrip();
             this.tmBind = new System.Windows.Forms.ToolStripMenuItem();
             this.tmremovebind = new System.Windows.Forms.ToolStripMenuItem();
@@ -234,6 +235,7 @@
             this.ControlBox = false;
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.Menu);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.Menu;
             this.Name = "BinColFrm";
             this.Text = "绑定字段";

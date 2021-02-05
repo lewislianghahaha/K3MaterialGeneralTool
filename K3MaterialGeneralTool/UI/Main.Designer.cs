@@ -502,14 +502,16 @@
             // 
             // Main
             // 
+            this.AcceptButton = this.btnSearch;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1046, 606);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.Menu);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.Menu;
             this.Name = "Main";
-            this.Text = "K3物料建档生成工具";
+            this.Text = "K3物料建档批量生成工具";
             this.Menu.ResumeLayout(false);
             this.Menu.PerformLayout();
             this.panel1.ResumeLayout(false);
