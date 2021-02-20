@@ -332,11 +332,11 @@ namespace K3MaterialGeneralTool.Task
                 newrow[9] = i == 0 ? 1 : nkg;                                    //FCONVERTDENOMINATOR(换算关系)
                 newrow[10] = 1;                                                  //FCREATEORGID
                 newrow[11] = 1;                                                  //FUSEORGID
-                newrow[12] = 100005;                                             //FCREATORID(创建者)
+                newrow[12] = 380167;                                             //FCREATORID(创建者)  380167(信息管理科) 100005(阮明达)
                 newrow[13] = DateTime.Now.Date;                                  //FCREATEDATE
-                newrow[14] = 100005;                                             //FMODIFIERID(修改者)
+                newrow[14] = 380167;                                             //FMODIFIERID(修改者) 380167(信息管理科)
                 newrow[15] = DateTime.Now.Date;                                  //FMODIFYDATE
-                newrow[16] = 100005;                                             //FAPPROVERID(审核者)
+                newrow[16] = 380167;                                             //FAPPROVERID(审核者) 380167(信息管理科)
                 newrow[17] = DateTime.Now.Date;                                  //FAPPROVEDATE
                 newrow[18] = 0;                                                  //FFORBIDDERID
                 newrow[19] = DateTime.Now.Date;                                  //FFORBIDDATE
@@ -445,9 +445,9 @@ namespace K3MaterialGeneralTool.Task
                             //若K3字段不包含 FCREATORID FCREATEDATE FMODIFYDATE FDOCUMENTSTATUS,就将旧记录赋给临时表对应的项内
                             switch (k3Colname)
                             {
-                                case "FCREATORID":      //创建者ID
-                                case "FMODIFIERID":     //修改者ID
-                                    newrow[j] = 100005;  
+                                case "FCREATORID":      //创建者ID 380167(信息管理科) 100005(阮明达)
+                                case "FMODIFIERID":     //修改者ID 380167(信息管理科)
+                                    newrow[j] = 380167;  
                                     break;
                                 case "FCREATEDATE":     //创建日期
                                 case "FMODIFYDATE":     //修改日期

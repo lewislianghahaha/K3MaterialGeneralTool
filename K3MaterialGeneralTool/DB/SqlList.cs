@@ -696,11 +696,11 @@ namespace K3MaterialGeneralTool.DB
                                    F_YTC_DECIMAL ,F_YTC_BASE1 ,F_YTC_DECIMAL1 ,F_YTC_DECIMAL2 ,F_YTC_TEXT ,
                                    F_YTC_REMARK ,F_YTC_ASSISTANT4 ,F_YTC_ASSISTANT5 ,F_YTC_IMAGE ,FISSALESBYNET ,
                                    F_YTC_ASSISTANT6 ,F_YTC_ASSISTANT7 ,F_YTC_REMARK1 ,F_YTC_INTEGER ,F_YTC_DECIMAL3 ,
-                                   F_YTC_DECIMAL4 ,F_YTC_DECIMAL5 ,F_YTC_DECIMAL6 ,F_YTC_TEXT1 ,F_YTC_TEXT2 /*,
+                                   F_YTC_DECIMAL4 ,F_YTC_DECIMAL5 ,F_YTC_DECIMAL6 ,F_YTC_TEXT1 ,F_YTC_TEXT2,
                                    F_YTC_BASE2 ,F_YTC_BASE3 ,F_YTC_TEXT9 ,F_YTC_DECIMAL7 ,F_YTC_DECIMAL8 ,
                                    F_YTC_TEXT8 ,F_YTC_TEXT7 ,F_YTC_TEXT6 ,F_YTC_TEXT5 ,F_YTC_ASSISTANT8 ,
                                    F_YTC_TEXT4 ,F_YTC_TEXT3 ,F_YTC_TEXT10 ,F_YTC_TEXT11 ,F_YTC_REMARK2 ,
-                                   F_YTC_REMARK3 */
+                                   F_YTC_REMARK3
                             FROM dbo.T_BD_MATERIAL
                             WHERE FMATERIALID='{fmaterialid}'
                         ";
