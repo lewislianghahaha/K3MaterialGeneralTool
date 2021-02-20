@@ -457,8 +457,23 @@ namespace K3MaterialGeneralTool.Task
                                 case "FFORBIDSTATUS":
                                     newrow[j] = "A";     //单据状态:创建
                                     break;
+                                //检测若mdt.rows[i][j]为空值,若对应的列名包含F_YTC_TEXT F_YTC_REMARK F_YTC_ASSISTANT的就返回"",若包含F_YTC_DECIMAL F_YTC_BASE的就返回0;若正常即直接赋值
                                 default:
-                                    newrow[j] = mdt.Rows[i][j];
+                                    if (mdt.Rows[i][j].ToString() == "")
+                                    {
+                                        if (k3Colname.Contains("F_YTC_TEXT") || k3Colname.Contains("F_YTC_REMARK") || k3Colname.Contains("F_YTC_ASSISTANT"))
+                                        {
+                                            newrow[j] = "";
+                                        }
+                                        else if (k3Colname.Contains("F_YTC_DECIMAL") || k3Colname.Contains("F_YTC_BASE"))
+                                        {
+                                            newrow[j] = 0;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newrow[j] = mdt.Rows[i][j];
+                                    }
                                     break;
                             }
                         }
@@ -604,7 +619,7 @@ namespace K3MaterialGeneralTool.Task
                 //判断若typenamelist<2,即返回null
                 if (typenamelist.Length < 2)
                 {
-                    result = null;
+                    result = "";
                 }
                 else
                 {
