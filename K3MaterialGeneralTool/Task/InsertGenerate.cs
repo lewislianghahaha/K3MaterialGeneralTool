@@ -457,9 +457,23 @@ namespace K3MaterialGeneralTool.Task
                                 case "FFORBIDSTATUS":
                                     newrow[j] = "A";     //单据状态:创建
                                     break;
-                                case "F_YTC_REMARK":
-                                case "F_YTC_TEXT1":
-                                case "F_YTC_TEXT2":
+                                case "F_YTC_REMARK":     //基本.包装规格(组成规则:名称-规格型号-包装系数值+罐/箱)
+                                    newrow[j] = Convert.ToString(exceltempdt.Rows[0][2]) + "-" + Convert.ToString(exceltempdt.Rows[0][4]) + "-" + Convert.ToString(exceltempdt.Rows[0][3]) + "罐/箱";
+                                    break;
+                                case "F_YTC_REMARK1":    //基本.排序(方法:若mdt.rows[i][j]有值,就将原来的信息进行截取并与‘物料编码’进行合拼)
+                                    if (mdt.Rows[i][j].ToString() == "")
+                                    {
+                                        newrow[j] = "";
+                                    }
+                                    else
+                                    {
+                                        //获取原来记录最后一个,的下标值(注:+1是为了包含,)
+                                        var endid = Convert.ToString(mdt.Rows[i][j]).LastIndexOf(",", StringComparison.Ordinal)+1;
+                                        newrow[j] = Convert.ToString(mdt.Rows[i][j]).Substring(0,endid) + Convert.ToString(exceltempdt.Rows[0][1]);
+                                    }
+                                    break;
+                                case "F_YTC_TEXT1":      //标签名称
+                                case "F_YTC_TEXT2":      //标签代码
                                     newrow[j] = "";
                                     break;
                                 //检测若mdt.rows[i][j]为空值,若对应的列名包含F_YTC_TEXT F_YTC_REMARK F_YTC_ASSISTANT的就返回"",若包含F_YTC_DECIMAL F_YTC_BASE的就返回0;若正常即直接赋值
