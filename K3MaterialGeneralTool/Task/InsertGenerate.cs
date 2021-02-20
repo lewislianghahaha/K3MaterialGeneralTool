@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using K3MaterialGeneralTool.DB;
@@ -453,6 +454,9 @@ namespace K3MaterialGeneralTool.Task
                                 case "FMODIFYDATE":     //修改日期
                                     newrow[j] = DateTime.Now.Date;
                                     break;
+                                case "FAPPROVEDATE":    //审核日期
+                                    newrow[j] = DBNull.Value;
+                                    break;
                                 case "FDOCUMENTSTATUS":
                                 case "FFORBIDSTATUS":
                                     newrow[j] = "A";     //单据状态:创建
@@ -468,13 +472,15 @@ namespace K3MaterialGeneralTool.Task
                                     else
                                     {
                                         //获取原来记录最后一个,的下标值(注:+1是为了包含,)
-                                        var endid = Convert.ToString(mdt.Rows[i][j]).LastIndexOf(",", StringComparison.Ordinal)+1;
+                                        var endid = Convert.ToString(mdt.Rows[i][j]).LastIndexOf(",", StringComparison.Ordinal) + 1;
                                         newrow[j] = Convert.ToString(mdt.Rows[i][j]).Substring(0,endid) + Convert.ToString(exceltempdt.Rows[0][1]);
                                     }
                                     break;
                                 case "F_YTC_TEXT1":      //标签名称
+                                    newrow[j] = GetMaterialNameAndCode(0,Convert.ToString(exceltempdt.Rows[0][2]));
+                                    break;
                                 case "F_YTC_TEXT2":      //标签代码
-                                    newrow[j] = "";
+                                    newrow[j] = GetMaterialNameAndCode(1, Convert.ToString(exceltempdt.Rows[0][2]));
                                     break;
                                 //检测若mdt.rows[i][j]为空值,若对应的列名包含F_YTC_TEXT F_YTC_REMARK F_YTC_ASSISTANT的就返回"",若包含F_YTC_DECIMAL F_YTC_BASE的就返回0;若正常即直接赋值
                                 default:
@@ -505,7 +511,6 @@ namespace K3MaterialGeneralTool.Task
             }
             catch (Exception)
             {
-                //var a = ex.Message;
                 result = false;
             }
 
@@ -707,6 +712,55 @@ namespace K3MaterialGeneralTool.Task
             return search.MakeDtidKey(13);
         }
 
+        /// <summary>
+        /// 根据物料名称获取‘标签名称(代码)’
+        /// </summary>
+        /// <param name="typeid">0:获取标签名称 1:获取标签代码</param>
+        /// <param name="materialname"></param>
+        /// <returns></returns>
+        private string GetMaterialNameAndCode(int typeid,string materialname)
+        {
+            string result;
+            var startid = 0;  //截取字符串起始位置
+            var endid = 0;   //截取字符串结束位置
+
+            //检测materialname是否包含中文
+            var check = Regex.IsMatch(materialname, @"[\u4e00-\u9fa5]");
+
+            //获取标签名称
+            if (typeid == 0)
+            {
+                //若不包含中文即返回空值
+                if (!check)
+                {
+                    result = "";
+                }
+
+            }
+            //获取标签代码
+            else
+            {
+
+            }
+
+           // string num = "RC-MERCEDES 172(RC彩罐/空白箱)";//"K3-2K111法拉利红(彩罐牛危)";
+
+            //检测到字符串出现首个中文,并以此对应下标为最终截取大小,从而获取不包含中文的值
+            //用的是ASCII码判断,在ASCII码表中,英文的范围是0-127,而汉字则是大于127,根据这个范围可以判断;然后获取之前的字符
+            for (var i = 0; i < materialname.Length; i++)
+            {
+                if ((int)materialname[i] > 127)
+                {
+                    num1 = materialname.Substring(0, i);
+                    break;
+                }
+            }
+
+            
+
+            return result;
+        }
+
         #endregion
 
         /// <summary>
@@ -738,8 +792,6 @@ namespace K3MaterialGeneralTool.Task
                 MessageBox.Show(ex.Message, $"错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-
 
     }
 }
