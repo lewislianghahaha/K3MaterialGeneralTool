@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using K3MaterialGeneralTool.DB;
@@ -735,29 +734,41 @@ namespace K3MaterialGeneralTool.Task
                 {
                     result = "";
                 }
-
+                else
+                {
+                    //检测到字符串出现首个中文,并以此对应下标为最终截取大小,从而获取不包含中文的值
+                    //用的是ASCII码判断,在ASCII码表中,英文的范围是0-127,而汉字则是大于127,根据这个范围可以判断;然后获取之前的字符
+                    for (var i = 0; i < materialname.Length; i++)
+                    {
+                        if ((int) materialname[i] <= 127) continue;
+                        startid = i;
+                        break;
+                    }
+                    //从有中文的位置开始至结束
+                    result = materialname.Substring(startid);
+                }
             }
             //获取标签代码
             else
             {
-
-            }
-
-           // string num = "RC-MERCEDES 172(RC彩罐/空白箱)";//"K3-2K111法拉利红(彩罐牛危)";
-
-            //检测到字符串出现首个中文,并以此对应下标为最终截取大小,从而获取不包含中文的值
-            //用的是ASCII码判断,在ASCII码表中,英文的范围是0-127,而汉字则是大于127,根据这个范围可以判断;然后获取之前的字符
-            for (var i = 0; i < materialname.Length; i++)
-            {
-                if ((int)materialname[i] > 127)
+                if (!check)
                 {
-                    num1 = materialname.Substring(0, i);
-                    break;
+                    result = materialname;
+                }
+                else
+                {
+                    //检测到字符串出现首个中文,并以此对应下标为最终截取大小,从而获取不包含中文的值
+                    //用的是ASCII码判断,在ASCII码表中,英文的范围是0-127,而汉字则是大于127,根据这个范围可以判断;然后获取之前的字符
+                    for (var i = 0; i < materialname.Length; i++)
+                    {
+                        if ((int)materialname[i] <= 127) continue;
+                        endid = i;
+                        break;
+                    }
+                    //从0开始至有首个中文位置的前一位
+                    result = materialname.Substring(0,endid);
                 }
             }
-
-            
-
             return result;
         }
 
