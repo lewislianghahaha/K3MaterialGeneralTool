@@ -453,6 +453,9 @@ namespace K3MaterialGeneralTool.Task
                                 case "FMODIFYDATE":     //修改日期
                                     newrow[j] = DateTime.Now.Date;
                                     break;
+                                case "FAPPROVERID":     //审核人
+                                    newrow[j] = 0;
+                                    break;
                                 case "FAPPROVEDATE":    //审核日期
                                     newrow[j] = DBNull.Value;
                                     break;
@@ -480,6 +483,29 @@ namespace K3MaterialGeneralTool.Task
                                     break;
                                 case "F_YTC_TEXT2":      //标签代码
                                     newrow[j] = GetMaterialNameAndCode(1, Convert.ToString(exceltempdt.Rows[0][2]));
+                                    break;
+                                //将系数 干燥性 颜色 U订货商品编码清空
+                                case "F_YTC_ASSISTANT2":      //系数
+                                case "F_YTC_ASSISTANT111":    //干燥性
+                                case "F_YTC_ASSISTANT111111": //颜色
+                                case "F_YTC_TEXT8":           //U订货商品编码
+                                    newrow[j] = "";
+                                    break;
+                                case "F_YTC_DECIMAL7":        //U订货计价规格
+                                    //根据EXCEL内获取的‘规格型号’信息;若包含套的,此项为1;反之,取‘规格型号’内的数值
+                                    var kui = Convert.ToString(exceltempdt.Rows[0][4]);
+
+                                    if (kui.Contains("套"))
+                                    {
+                                        newrow[j] = 1;
+                                    }
+                                    else
+                                    {
+                                        //获取‘规格型号’内的数值
+                                        var str = Regex.Replace(kui, @"[^\d.\d]", "");
+                                        //如果是数字，则转换为decimal类型,否则为0
+                                        newrow[j] = Regex.IsMatch(str, @"^[+-]?\d*[.]?\d*$") ? decimal.Parse(str) : 0;
+                                    }
                                     break;
                                 //检测若mdt.rows[i][j]为空值,若对应的列名包含F_YTC_TEXT F_YTC_REMARK F_YTC_ASSISTANT的就返回"",若包含F_YTC_DECIMAL F_YTC_BASE的就返回0;若正常即直接赋值
                                 default:

@@ -247,12 +247,16 @@ namespace K3MaterialGeneralTool.DB
                             INNER JOIN dbo.T_BAS_ASSISTANTDATAENTRY B ON A.FID=B.FID
                             INNER JOIN dbo.T_BAS_ASSISTANTDATAENTRY_L C ON B.FENTRYID=C.FENTRYID AND C.FLOCALEID=2052
                             WHERE a.FID='5dd1e57223d58f'
+                            
+                            UNION ALL                            
 
                             ---------------------------------------------------------------------------
                             --包装罐(包装箱)
-                            SELECT /*a.F_YTC_TEXT 编码,*/13 TYPEID,a.FID ID,a.F_YTC_TEXT1 NAME,GETDATE() CreateDt 
+                            SELECT /*a.F_YTC_TEXT 编码,*/13 TYPEID,convert(varchar(100),A.FID) ID,a.F_YTC_TEXT1 NAME,GETDATE() CreateDt 
                             FROM dbo.ytc_t_Cust100010 a --WHERE a.F_YTC_TEXT='T-0001'
-                            ORDER BY A.F_YTC_TEXT
+                            --ORDER BY A.F_YTC_TEXT
+
+                            UNION ALL
 
                             --物料分组(辅助)
                             SELECT /*A.FID,A.FNUMBER,B.FNUMBER 编号,*/14 TYPEID,B.FENTRYID ID,C.FDATAVALUE NAME,GETDATE() CreateDt
