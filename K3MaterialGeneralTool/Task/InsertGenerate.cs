@@ -13,6 +13,7 @@ namespace K3MaterialGeneralTool.Task
         #region  参数定义
         private int _newmaterialid = 0;    //记录新fmaterialid
         private int _salesunit = 0;       //记录旧记录-销售.销售单位(FSALEUNITID);生成‘单位换算’表时使用
+        private DataTable _guandt;        //记录初始化的罐箱记录;新建时需要使用
         #endregion
 
         SqlList sqlList = new SqlList();
@@ -134,6 +135,9 @@ namespace K3MaterialGeneralTool.Task
 
             try
             {
+                //初始化获取罐箱相关内容
+                _guandt = search.GetGuanXuanDtl();
+
                 //定义历史记录表(结果集)临时表
                 _resultdt = tempDtList.CreateHistoryRecordTempdt();
                 //获取绑定记录表
@@ -366,6 +370,11 @@ namespace K3MaterialGeneralTool.Task
 
             try
             {
+                //根据EXCEL-‘包装罐’查询相关记录
+                var guanrows = _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][5]) + "'");
+                //根据EXCEL-‘包装箱’查询相关记录
+                var xuanrows = _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][6]) + "'");
+
                 //循环mdt数据源-行
                 for (var i = 0; i < mdt.Rows.Count; i++)
                 {
@@ -507,6 +516,26 @@ namespace K3MaterialGeneralTool.Task
                                         newrow[j] = Regex.IsMatch(str, @"^[+-]?\d*[.]?\d*$") ? decimal.Parse(str) : 0;
                                     }
                                     break;
+                                //add date:20210301
+                                case "FGROSSWEIGHT":       //罐重
+                                    newrow[j] = guanrows.Length == 0 ? 0 : Convert.ToDecimal(guanrows[0][2]);
+                                    break;
+                                case "FLENGTH":            //长
+                                    newrow[j] = xuanrows.Length == 0 ? 0 : Convert.ToDecimal(xuanrows[0][3]);
+                                    break;
+                                case "FWIDTH":             //宽
+                                    newrow[j] = xuanrows.Length == 0 ? 0 : Convert.ToDecimal(xuanrows[0][4]);
+                                    break;
+                                case "FHEIGHT":            //高
+                                    newrow[j] = xuanrows.Length == 0 ? 0 : Convert.ToDecimal(xuanrows[0][5]);
+                                    break;
+                                case "FVOLUME":            //体积
+                                    newrow[j] = xuanrows.Length == 0 ? 0 : Convert.ToDecimal(xuanrows[0][6]);
+                                    break;
+                                case "F_YTC_DECIMAL2":     //箱重
+                                    newrow[j] = xuanrows.Length == 0 ? 0 : Convert.ToDecimal(xuanrows[0][7]);
+                                    break;
+
                                 //检测若mdt.rows[i][j]为空值,若对应的列名包含F_YTC_TEXT F_YTC_REMARK F_YTC_ASSISTANT的就返回"",若包含F_YTC_DECIMAL F_YTC_BASE的就返回0;若正常即直接赋值
                                 default:
                                     if (mdt.Rows[i][j].ToString() == "")

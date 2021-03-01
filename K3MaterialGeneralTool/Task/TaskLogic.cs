@@ -34,6 +34,7 @@ namespace K3MaterialGeneralTool.Task
         #region 生成
 
         private DataTable _importGridviewdt;     //从EXCEL导入的GridViewDT        
+        private DataTable _importdt;             //从EXCEL导入的DT(检测是否已在DB存在使用)
         #endregion
 
         #region 返回变量
@@ -86,6 +87,10 @@ namespace K3MaterialGeneralTool.Task
         /// 从EXCEL导入的GridViewDT
         /// </summary>
         public DataTable ImportGridviewdt { set { _importGridviewdt = value; } }
+        /// <summary>
+        /// 从EXCEL导入的DT(检测是否已在DB存在使用)
+        /// </summary>
+        public DataTable Importdt { set { _importdt = value; } }
         #endregion
 
         #region Get(返回值至外部)
@@ -189,6 +194,14 @@ namespace K3MaterialGeneralTool.Task
         public bool GenerateRecord()
         {
            return _resultMark = generate.GenerateAndCreateK3NewMaterialRecord(_importGridviewdt);
+        }
+
+        /// <summary>
+        /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,即删除
+        /// </summary>
+        public void SearchImportIdAndDel()
+        {
+            searchDb.SearchImportIdAndDel(_importdt);
         }
 
         #endregion

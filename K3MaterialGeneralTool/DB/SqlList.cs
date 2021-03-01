@@ -948,6 +948,35 @@ namespace K3MaterialGeneralTool.DB
             return _result;
         }
 
+        /// <summary>
+        /// 初始化获取罐箱相关明细(创建新记录时使用)
+        /// </summary>
+        /// <returns></returns>
+        public string GetGuanXuanDtl()
+        {
+            _result = $@"
+                           SELECT a.F_YTC_TEXT 编码,a.F_YTC_TEXT1 名称,A.F_YTC_DECIMAL 罐重,
+	                            A.F_YTC_DECIMAL1 长,A.F_YTC_DECIMAL2 宽,A.F_YTC_DECIMAL3 高,A.F_YTC_DECIMAL4 体积,
+	                            A.F_YTC_DECIMAL5 箱重
+                           FROM dbo.ytc_t_Cust100010 a 
+                        ";
+
+            return _result;
+        }
+
+        /// <summary>
+        /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,即删除
+        /// </summary>
+        /// <returns></returns>
+        public string SearchMaterialFnumber(string fnumber)
+        {
+            _result = $@"
+                            SELECT FMATERIALID FROM dbo.T_BD_MATERIAL WHERE FNUMBER IN ({fnumber})
+                        ";
+
+            return _result;
+        }
+
         #endregion
 
         #endregion

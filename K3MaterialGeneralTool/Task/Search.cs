@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using K3MaterialGeneralTool.DB;
+using NPOI.SS.Formula.Functions;
 
 namespace K3MaterialGeneralTool.Task
 {
@@ -114,6 +115,33 @@ namespace K3MaterialGeneralTool.Task
             return UseSqlSearchIntoDt(1,_sqlscript);
         }
 
+        /// <summary>
+        /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,即删除
+        /// </summary>
+        public void SearchImportIdAndDel(DataTable importdt)
+        {
+            var numberlist = string.Empty;
+
+            //循环获取import.rows[1]中的'物料编码'并放到T_BD_MATERIAL.FNUMBER进行查询,若有,即获取fmaterial并执行删除操作
+            foreach (DataRow rows in importdt.Rows)
+            {
+                if (numberlist == "")
+                {
+                    numberlist = "'" + Convert.ToString(rows[1]) + "'";
+                }
+                else
+                {
+                    numberlist += ',' + "'" + Convert.ToString(rows[1]) + "'";
+                }
+            }
+            //将numberlist进行查询,若存在即删除
+            var deldt = UseSqlSearchIntoDt(0, sqlList.SearchMaterialFnumber(numberlist));
+            //将已存在的fmaterialid删除
+            foreach (DataRow rows in deldt.Rows)
+            {
+                DelNewMaterialRecord(Convert.ToInt32(rows[0]));
+            }
+        }
 
 
         #region 生成时所需相关方法
@@ -227,6 +255,16 @@ namespace K3MaterialGeneralTool.Task
         {
             _sqlscript = sqlList.DelNewMaterialRecord(fmaterialid);
             return Generdt(0, _sqlscript);
+        }
+
+        /// <summary>
+        /// 初始化获取罐箱相关明细(创建新记录时使用)
+        /// </summary>
+        /// <returns></returns>
+        public DataTable GetGuanXuanDtl()
+        {
+            _sqlscript = sqlList.GetGuanXuanDtl();
+            return UseSqlSearchIntoDt(0, _sqlscript);
         }
 
         #endregion
