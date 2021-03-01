@@ -142,6 +142,8 @@ namespace K3MaterialGeneralTool.Task
                 _resultdt = tempDtList.CreateHistoryRecordTempdt();
                 //获取绑定记录表
                 var binddt = search.SearchBind();
+                //若根据'物料编码'在DB内查找到有相关记录,就先记录,在最后完成生成后对此_samematerialidlist相关的记录进行删除
+                var samematerialiddt = search.SearchImportIdAndDel(importdt);
 
                 //循环读取importdt内的记录
                 foreach (DataRow rows in importdt.Rows)
@@ -149,7 +151,7 @@ namespace K3MaterialGeneralTool.Task
                     //根据‘品牌’及‘规格型号’获取K3物料中TOP 1的Fmaterialid(注:若此没有记录,即马上跳出当前循环)
                     var searchdt = search.SearchTop1MaterialRecord(Convert.ToString(rows[0]),Convert.ToString(rows[4]));
 
-                    if (searchdt.Rows.Count==0)
+                    if (searchdt.Rows.Count == 0)
                     {
                         CreateGenerateRecord(rows, 1, $@"没有在K3中找到品牌:'{Convert.ToString(rows[0])}'及规格型号:'{Convert.ToString(rows[4])}'的相关记录,故不能自动生成新物料,请在K3进行手动创建");
                         continue;
@@ -248,6 +250,9 @@ namespace K3MaterialGeneralTool.Task
                     MakeUnitRecordToDb(_salesunit, excelmatcode, nkg,kui);
                     //最后若成功生成,并将rows插入至CreateGenerateRecord()内
                     CreateGenerateRecord(rows,0,"");
+                    //若_samematerialidlist有值,即执行删除操作
+                    if (samematerialiddt.Rows.Count <= 0) continue;
+                    DelSameRecord(samematerialiddt);
                 }
 
                 //1)将_resultdt插入T_MAT_ImportHistoryRecord表内 2) 最后将结果集添加至GlobalClasscs.RDt.Resultdt内
@@ -260,6 +265,19 @@ namespace K3MaterialGeneralTool.Task
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 将包含相同‘物料编码’的旧fmaterialid相关记录删除
+        /// </summary>
+        /// <param name="deldt"></param>
+        private void DelSameRecord(DataTable deldt)
+        {
+            //将已存在的fmaterialid删除
+            foreach (DataRow rows in deldt.Rows)
+            {
+                search.DelNewMaterialRecord(Convert.ToInt32(rows[0]));
+            }
         }
 
         /// <summary>

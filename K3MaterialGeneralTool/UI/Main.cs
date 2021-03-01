@@ -11,7 +11,6 @@ namespace K3MaterialGeneralTool.UI
     {
         TaskLogic task=new TaskLogic();
         Load load = new Load();
-        CheckImportDt checkImportDt=new CheckImportDt();
 
         #region 变量参数
         //保存查询出来的GridView记录
@@ -163,16 +162,7 @@ namespace K3MaterialGeneralTool.UI
             try
             {
                 if(gvdtl.RowCount==0) throw new Exception("检测到没有内容进行生成,请先进行导入Excel再继续");
-
                 var clickMessage = $"准备生成,\n 注:此次生成的结果会记录在‘查询建档历史记录’内 \n 是否继续?";
-
-                //根据GridView中的‘物料编码’进行查询,若发现已在DB内存在,即先清空后继续
-                task.Importdt = (DataTable) gvdtl.DataSource;
-                //子线程调用
-                new Thread(CheckRecordStart).Start();
-                checkImportDt.StartPosition = FormStartPosition.CenterScreen;
-                checkImportDt.ShowDialog();
-
                 if (MessageBox.Show(clickMessage, $"提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     //通过gvdtl获取内容并转化至DataTable
@@ -237,21 +227,6 @@ namespace K3MaterialGeneralTool.UI
             this.Invoke((ThreadStart)(() =>
             {
                 load.Close();
-            }));
-        }
-
-        /// <summary>
-        /// 子线程使用(重:用于监视功能调用情况,当完成时进行关闭LoadForm)-生成使用
-        /// </summary>
-        private void CheckRecordStart()
-        {
-            //检查是否存在
-            task.SearchImportIdAndDel();
-
-            //当完成后将Load子窗体关闭
-            this.Invoke((ThreadStart)(() =>
-            {
-                checkImportDt.Close();
             }));
         }
 

@@ -118,7 +118,7 @@ namespace K3MaterialGeneralTool.Task
         /// <summary>
         /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,即删除
         /// </summary>
-        public void SearchImportIdAndDel(DataTable importdt)
+        public DataTable SearchImportIdAndDel(DataTable importdt)
         {
             var numberlist = string.Empty;
 
@@ -134,13 +134,11 @@ namespace K3MaterialGeneralTool.Task
                     numberlist += ',' + "'" + Convert.ToString(rows[1]) + "'";
                 }
             }
+
             //将numberlist进行查询,若存在即删除
             var deldt = UseSqlSearchIntoDt(0, sqlList.SearchMaterialFnumber(numberlist));
-            //将已存在的fmaterialid删除
-            foreach (DataRow rows in deldt.Rows)
-            {
-                DelNewMaterialRecord(Convert.ToInt32(rows[0]));
-            }
+
+            return deldt;
         }
 
 
