@@ -582,6 +582,7 @@ namespace K3MaterialGeneralTool.Task
             }
             catch (Exception)
             {
+                //var a = ex.Message;
                 result = false;
             }
 
