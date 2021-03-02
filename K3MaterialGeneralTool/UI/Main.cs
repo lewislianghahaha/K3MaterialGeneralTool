@@ -28,6 +28,7 @@ namespace K3MaterialGeneralTool.UI
             InitializeComponent();
             OnInitialize();
             OnRegisterEvents();
+            OnShowList();
         }
 
         private void OnRegisterEvents()
@@ -56,6 +57,53 @@ namespace K3MaterialGeneralTool.UI
         {
             //设置TabControl控件默认显示页
             tbhistory.SelectedIndex = 1;
+        }
+
+        /// <summary>
+        /// 初始化下拉列表(查询历史记录使用)
+        /// </summary>
+        private void OnShowList()
+        {
+            var dt=new DataTable();
+
+            //创建表头
+            for (var i = 0; i < 2; i++)
+            {
+                var dc = new DataColumn();
+                switch (i)
+                {
+                    case 0:
+                        dc.ColumnName = "Id";
+                        break;
+                    case 1:
+                        dc.ColumnName = "Name";
+                        break;
+                }
+                dt.Columns.Add(dc);
+            }
+
+            //创建行内容
+            for (var j = 0; j < 2; j++)
+            {
+                var dr = dt.NewRow();
+
+                switch (j)
+                {
+                    case 0:
+                        dr[0] = "0";
+                        dr[1] = "是";
+                        break;
+                    case 1:
+                        dr[0] = "1";
+                        dr[1] = "否";
+                        break;
+                }
+                dt.Rows.Add(dr);
+            }
+
+            comlist.DataSource = dt.Copy();
+            comlist.DisplayMember = "Name"; //设置显示值
+            comlist.ValueMember = "Id";    //设置默认值内码
         }
 
         /// <summary>
@@ -249,6 +297,9 @@ namespace K3MaterialGeneralTool.UI
             var kui = txtkui.Text;
             //获取‘品牌’记录
             var bin = txtbin.Text;
+            //获取下拉列表所选值
+            var dvordertylelist = (DataRowView)comlist.Items[comlist.SelectedIndex];
+            var typeId = Convert.ToInt32(dvordertylelist["Id"]);
 
             //将各变量值赋给task变量
             task.Sdt = sdt;
@@ -256,6 +307,7 @@ namespace K3MaterialGeneralTool.UI
             task.Fmaterialname = materialname;
             task.Fkui = kui;
             task.Fbi = bin;
+            task.Finishid = typeId;
 
             //子线程调用
             new Thread(SearchHistoryStart).Start();

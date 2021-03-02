@@ -22,9 +22,10 @@ namespace K3MaterialGeneralTool.Task
         #region 历史记录使用
         private string _sdt;                   //开始日期
         private string _edt;                   //结束日期
-        private string _fmaterialname;           //物料名称
-        private string _fkui;                    //规格型号
-        private string _fbi;                     //品牌
+        private string _fmaterialname;         //物料名称
+        private string _fkui;                  //规格型号
+        private string _fbi;                   //品牌
+        private int _finishid;                 //是否完成ID
         #endregion
 
         #region Excel导入
@@ -78,6 +79,10 @@ namespace K3MaterialGeneralTool.Task
         /// 品牌
         /// </summary>
         public string Fbi { set { _fbi = value; } }
+        /// <summary>
+        /// 是否完成ID
+        /// </summary>
+        public int Finishid { set { _finishid = value; } }
         /// <summary>
         /// 文件地址
         /// </summary>
@@ -171,7 +176,7 @@ namespace K3MaterialGeneralTool.Task
         /// </summary>
         public void SearchHistoryRecord()
         {
-            _resultTable = searchDb.SearchHistoryRecord(_sdt, _edt, _fmaterialname, _fkui, _fbi);
+            _resultTable = searchDb.SearchHistoryRecord(_sdt, _edt, _fmaterialname, _fkui, _fbi, _finishid);
         }
 
         /// <summary>

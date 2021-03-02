@@ -993,8 +993,9 @@ namespace K3MaterialGeneralTool.DB
         /// <param name="fmaterialname">物料名称</param>
         /// <param name="fkui">规格型号</param>
         /// <param name="fbi">品牌</param>
+        /// <param name="typeid">是否完成;0:是 1:否</param>
         /// <returns></returns>
-        public string Get_SearchHistoryRecord(string sdt,string edt,string fmaterialname,string fkui,string fbi)
+        public string Get_SearchHistoryRecord(string sdt,string edt,string fmaterialname,string fkui,string fbi,int typeid)
         {
                 _result = $@"
                             SELECT A.FID,A.FMaterialCode 物料编码,A.FMaerialName 物料名称,A.FBi 品牌,A.FKui 规格型号,
@@ -1006,6 +1007,7 @@ namespace K3MaterialGeneralTool.DB
                             AND (A.FMaerialName like '%{fmaterialname}%' or '{fmaterialname}' is null)
                             AND (A.FKui LIKE '%{fkui}%' or '{fkui}' is null)
                             AND (A.FBi like '%{fbi}%' or '{fbi}' is null)
+                            AND A.Finishid ='{typeid}'
                             ORDER BY A.ImportDt
                        ";
 

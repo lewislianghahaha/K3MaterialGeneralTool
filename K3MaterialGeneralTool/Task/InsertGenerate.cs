@@ -250,14 +250,13 @@ namespace K3MaterialGeneralTool.Task
                     MakeUnitRecordToDb(_salesunit, excelmatcode, nkg,kui);
                     //最后若成功生成,并将rows插入至CreateGenerateRecord()内
                     CreateGenerateRecord(rows,0,"");
-                    //若_samematerialidlist有值,即执行删除操作
-                    if (samematerialiddt.Rows.Count <= 0) continue;
-                    DelSameRecord(samematerialiddt);
                 }
 
                 //1)将_resultdt插入T_MAT_ImportHistoryRecord表内 2) 最后将结果集添加至GlobalClasscs.RDt.Resultdt内
                 ImportDtToDb(1,"T_MAT_ImportHistoryRecord", _resultdt);
                 GlobalClasscs.RDt.Resultdt = _resultdt.Copy();
+                //若samematerialidlist有值,即执行删除操作
+                if (samematerialiddt.Rows.Count > 0) DelSameRecord(samematerialiddt);
             }
             catch (Exception)
             {

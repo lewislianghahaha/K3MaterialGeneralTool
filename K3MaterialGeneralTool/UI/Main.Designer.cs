@@ -74,6 +74,8 @@
             this.MenuImport = new System.Windows.Forms.MenuStrip();
             this.tmimportexcel = new System.Windows.Forms.ToolStripMenuItem();
             this.tmGenerate = new System.Windows.Forms.ToolStripMenuItem();
+            this.comlist = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.Menu.SuspendLayout();
             this.panel1.SuspendLayout();
             this.tbhistory.SuspendLayout();
@@ -335,6 +337,8 @@
             // 
             this.panel4.BackColor = System.Drawing.Color.SteelBlue;
             this.panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel4.Controls.Add(this.label6);
+            this.panel4.Controls.Add(this.comlist);
             this.panel4.Controls.Add(this.btnSearch);
             this.panel4.Controls.Add(this.txtbin);
             this.panel4.Controls.Add(this.label5);
@@ -500,6 +504,24 @@
             this.tmGenerate.Size = new System.Drawing.Size(95, 21);
             this.tmGenerate.Text = "生成K3新物料";
             // 
+            // comlist
+            // 
+            this.comlist.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comlist.FormattingEnabled = true;
+            this.comlist.Location = new System.Drawing.Point(430, 9);
+            this.comlist.Name = "comlist";
+            this.comlist.Size = new System.Drawing.Size(55, 20);
+            this.comlist.TabIndex = 11;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(369, 13);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(59, 12);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "是否成功:";
+            // 
             // Main
             // 
             this.AcceptButton = this.btnSearch;
@@ -583,6 +605,8 @@
         private System.Windows.Forms.ToolStripLabel toolStripLabel9;
         private System.Windows.Forms.ToolStripLabel toolStripLabel10;
         private System.Windows.Forms.ToolStripLabel tstotalrow;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox comlist;
     }
 }
 
