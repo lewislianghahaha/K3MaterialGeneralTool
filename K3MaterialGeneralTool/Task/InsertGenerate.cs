@@ -11,9 +11,10 @@ namespace K3MaterialGeneralTool.Task
     public class InsertGenerate
     {
         #region  参数定义
-        private int _newmaterialid = 0;    //记录新fmaterialid
-        private int _salesunit = 0;       //记录旧记录-销售.销售单位(FSALEUNITID);生成‘单位换算’表时使用
-        private DataTable _guandt;        //记录初始化的罐箱记录;新建时需要使用
+        private int _newmaterialid = 0;                //记录新fmaterialid
+        private int _salesunit = 0;                    //记录旧记录-销售.销售单位(FSALEUNITID);生成‘单位换算’表时使用
+        private DataTable _guandt;                     //记录初始化的罐箱记录;新建时需要使用
+        private string _errmessage = string.Empty;     //记录异常信息
         #endregion
 
         SqlList sqlList = new SqlList();
@@ -229,7 +230,7 @@ namespace K3MaterialGeneralTool.Task
                         //将materialdt tempdt keyid放至方法内进行选择插入,并返回bool,若为false,即跳转至CreateGenerateRecord()并break,loopmark为false
                         if (!MakeRecordToDb(i,materialdt, tempdt, exceltempdt, dtname, binddt))
                         {
-                            CreateGenerateRecord(rows,1,$@"物料编码:'{Convert.ToString(rows[1])}'不能成功插入,原因:插入'{dtname}'表时出现异常,请联系管理员");
+                            CreateGenerateRecord(rows,1,$@"物料编码:'{Convert.ToString(rows[1])}'不能成功插入,原因:插入'{dtname}'表时出现'{_errmessage}'异常,请联系管理员");
                             loopmark = false;
                             break;
                         }
@@ -580,9 +581,9 @@ namespace K3MaterialGeneralTool.Task
                 //最后将dtname及对应的内容进行插入
                 ImportDtToDb(0,dtname,tempdt);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //var a = ex.Message;
+                _errmessage = ex.Message;
                 result = false;
             }
 
