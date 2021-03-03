@@ -1013,7 +1013,7 @@ namespace K3MaterialGeneralTool.DB
                             AND (A.FBi like '%{fbi}%' or '{fbi}' is null)
                             AND A.Finishid ='{typeid}'
                             ORDER BY A.ImportDt
-                       ";
+                            ";
 
             return _result;
         }
