@@ -288,9 +288,9 @@ namespace K3MaterialGeneralTool.UI
         private void OnSearchHistory()
         {
             //获取所选择的'开始'日期
-            var sdt = dtstart.Value.Date.ToShortDateString();
+            var sdt = dtstart.Value.ToString("yyyy-MM-dd");
             //获取所选择的'结束'日期
-            var edt = dtend.Value.Date.ToShortDateString();
+            var edt = dtend.Value.ToString("yyyy-MM-dd");
             //获取‘物料名称’记录
             var materialname = txtmaterialname.Text;
             //获取‘规格型号’记录
