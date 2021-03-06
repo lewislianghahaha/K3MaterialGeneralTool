@@ -1,7 +1,4 @@
-﻿using System;
-using NPOI.SS.Formula.Functions;
-
-namespace K3MaterialGeneralTool.DB
+﻿namespace K3MaterialGeneralTool.DB
 {
     public class SqlList
     {
