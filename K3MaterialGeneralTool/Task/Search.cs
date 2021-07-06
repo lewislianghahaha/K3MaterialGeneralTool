@@ -40,6 +40,7 @@ namespace K3MaterialGeneralTool.Task
 
         /// <summary>
         /// 按照指定的SQL语句执行记录并返回执行结果（true 或 false）
+        /// 作用:更新及删除
         /// </summary>
         /// <param name="type">0:获取K3-CLOUD数据库 1:获取MaterialGeneral数据库</param>
         /// <param name="sqlscript"></param>
