@@ -31,7 +31,6 @@ namespace K3MaterialGeneralTool.Task
         #endregion
 
         #region 生成
-
         private DataTable _importGridviewdt;     //从EXCEL导入的GridViewDT
         #endregion
 
