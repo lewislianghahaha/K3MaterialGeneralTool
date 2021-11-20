@@ -304,6 +304,14 @@
                             WHERE A.FIsBaseUnit='1'
                             --ORDER BY A.FNUMBER
 
+                            UNION ALL
+                            
+                            --化学品分类
+                            SELECT 19 TYPEID,b.FENTRYID ID,b.FDATAVALUE NAME,GETDATE() CreateDt
+                            FROM T_BAS_ASSISTANTDATAENTRY  a
+                            INNER JOIN dbo.T_BAS_ASSISTANTDATAENTRY_L b ON a.FENTRYID=b.FENTRYID
+                            WHERE a.FID='6139bef6827423'--a.FENTRYID='6139bf1682743f'
+
                             )X
                         ";
             return _result;
@@ -705,7 +713,7 @@
                                    F_YTC_BASE2 ,F_YTC_BASE3 ,F_YTC_TEXT9 ,F_YTC_DECIMAL7 ,F_YTC_DECIMAL8 ,
                                    F_YTC_TEXT8 ,F_YTC_TEXT7 ,F_YTC_TEXT6 ,F_YTC_TEXT5 ,F_YTC_ASSISTANT8 ,
                                    F_YTC_TEXT4 ,F_YTC_TEXT3 ,F_YTC_TEXT10 ,F_YTC_TEXT11 ,F_YTC_REMARK2 ,
-                                   F_YTC_REMARK3
+                                   F_YTC_REMARK3,F_YTC_REMARK4,F_YTC_REMARK5,F_YTC_ASSISTANT9,F_YTC_DECIMAL9,F_YTC_TEXT12
                             FROM dbo.T_BD_MATERIAL
                             WHERE FMATERIALID='{fmaterialid}'
                         ";
@@ -966,13 +974,13 @@
         }
 
         /// <summary>
-        /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,即删除
+        /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,并且单据状态为‘创建’,即删除
         /// </summary>
         /// <returns></returns>
         public string SearchMaterialFnumber(string fnumber)
         {
             _result = $@"
-                            SELECT FMATERIALID FROM dbo.T_BD_MATERIAL WHERE FNUMBER IN ({fnumber})
+                            SELECT FMATERIALID FROM dbo.T_BD_MATERIAL WHERE FNUMBER IN ({fnumber}) AND FDOCUMENTSTATUS ='A'
                         ";
 
             return _result;
