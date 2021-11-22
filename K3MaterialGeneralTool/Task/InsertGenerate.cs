@@ -143,7 +143,8 @@ namespace K3MaterialGeneralTool.Task
                 _resultdt = tempDtList.CreateHistoryRecordTempdt();
                 //获取绑定记录表
                 var binddt = search.SearchBind();
-                //若根据'物料编码'在DB内查找到有相关记录,就先记录,在最后完成生成后对此samematerialidlist相关的记录进行删除
+                //若根据'物料编码'在DB内查找到有相关记录,就先记录,在最后完成生成后对此samematerialidlist相关的记录进行删除(已取消 change date:20211122)
+                //现已修改为当出现这种情况时,就跳过不进行插入,并在结果集内提示原因(change date:20211122)
                 var samematerialiddt = search.SearchImportIdAndDel(importdt);
 
                 //循环读取importdt内的记录
@@ -157,6 +158,15 @@ namespace K3MaterialGeneralTool.Task
                         CreateGenerateRecord(rows, 1, $@"没有在K3中找到品牌:'{Convert.ToString(rows[0])}'及规格型号:'{Convert.ToString(rows[4])}'的相关记录,故不能自动生成新物料,请在K3进行手动创建");
                         continue;
                     }
+                    //检测若循环的物料在samematerialiddt临时表内获在,即表示已在K3里内存在,不能进行插入,并需在结果集内体现
+                    var dtlrow = samematerialiddt.Select("FNUMBER='"+Convert.ToString(rows[1])+"'");
+                    if (dtlrow.Length>0)
+                    {
+                        CreateGenerateRecord(rows,1,$"检测到要导入的物料编码:'{Convert.ToString(rows[1])}'已在K3内存在,故不能自动生成新物料,请检查后再执行");
+                        continue;
+                    }
+
+
                     //若searchdt有值,即将fmaterial赋值给oldmaterialid
                     var oldmaterialid = Convert.ToInt32(searchdt.Rows[0][0]);
 
@@ -256,8 +266,8 @@ namespace K3MaterialGeneralTool.Task
                 //1)将_resultdt插入T_MAT_ImportHistoryRecord表内 2) 最后将结果集添加至GlobalClasscs.RDt.Resultdt内
                 ImportDtToDb(1,"T_MAT_ImportHistoryRecord", _resultdt);
                 GlobalClasscs.RDt.Resultdt = _resultdt.Copy();
-                //若samematerialidlist有值,即执行删除操作
-                if (samematerialiddt.Rows.Count > 0) DelSameRecord(samematerialiddt);
+                //若samematerialidlist有值,即执行删除操作(已取消;change date:20211122)
+                //if (samematerialiddt.Rows.Count > 0) DelSameRecord(samematerialiddt);
             }
             catch (Exception)
             {
@@ -268,7 +278,7 @@ namespace K3MaterialGeneralTool.Task
         }
 
         /// <summary>
-        /// 将包含相同‘物料编码’的旧fmaterialid相关记录删除
+        /// 将包含相同‘物料编码’的旧fmaterialid相关记录删除(已取消 change date:20211122)
         /// </summary>
         /// <param name="deldt"></param>
         private void DelSameRecord(DataTable deldt)

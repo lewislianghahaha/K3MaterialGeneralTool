@@ -974,13 +974,14 @@
         }
 
         /// <summary>
-        /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,并且单据状态为‘创建’,即删除
+        /// 根据导入过来的DT,查询并整理;若发现‘物料编码’已在DB内存在,并且单据状态为‘创建’,即删除(已取消,change date:20211122)
+        /// 现已修改为当出现这种情况时,就跳过不进行插入,并在结果集内提示原因(change date:20211122)
         /// </summary>
         /// <returns></returns>
         public string SearchMaterialFnumber(string fnumber)
         {
             _result = $@"
-                            SELECT FMATERIALID FROM dbo.T_BD_MATERIAL WHERE FNUMBER IN ({fnumber}) AND FDOCUMENTSTATUS ='A'
+                            SELECT FNUMBER FROM dbo.T_BD_MATERIAL WHERE FNUMBER IN ({fnumber}) /*AND FDOCUMENTSTATUS ='A'*/
                         ";
 
             return _result;
