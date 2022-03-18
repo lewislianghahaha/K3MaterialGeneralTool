@@ -472,16 +472,12 @@ namespace K3MaterialGeneralTool.Task
                             {
                                 newrow[j] = Convert.ToDecimal(colvalue);
                             }
-                            //change date:20220318 在T_BD_MATERIAL表,若循环到 F_YTC_DECIMAL(罐/箱) 即将记录赋值至 F_YTC_DECIMAL3(包装系数)内
-                            else if (dtname== "T_BD_MATERIAL" && k3Colname== "F_YTC_DECIMAL" && j==48)
-                            {
-                                newrow[j] = Convert.ToDecimal(colvalue);
-                            }
                             else
                             {
                                 newrow[j] = colvalue;
                             }
                         }
+                        //执行没有绑定的字段数据对接
                         else
                         {
                             //若K3字段不包含 FCREATORID FCREATEDATE FMODIFYDATE FDOCUMENTSTATUS,就将旧记录赋给临时表对应的项内
@@ -571,20 +567,29 @@ namespace K3MaterialGeneralTool.Task
 
                                 //检测若mdt.rows[i][j]为空值,若对应的列名包含F_YTC_TEXT F_YTC_REMARK F_YTC_ASSISTANT的就返回"",若包含F_YTC_DECIMAL F_YTC_BASE的就返回0;若正常即直接赋值
                                 default:
-                                    if (mdt.Rows[i][j].ToString() == "")
+                                //change date:20220318 在T_BD_MATERIAL表,若循环到  F_YTC_DECIMAL3(包装系数) [48] 即将F_YTC_DECIMAL(罐/箱) [34]记录进行赋值
+                                    if (dtname == "T_BD_MATERIAL" && j == 48)
                                     {
-                                        if (k3Colname.Contains("F_YTC_TEXT") || k3Colname.Contains("F_YTC_REMARK") || k3Colname.Contains("F_YTC_ASSISTANT"))
-                                        {
-                                            newrow[j] = "";
-                                        }
-                                        else if (k3Colname.Contains("F_YTC_DECIMAL") || k3Colname.Contains("F_YTC_BASE"))
-                                        {
-                                            newrow[j] = 0;
-                                        }
+                                        newrow[j] = Convert.ToDecimal(newrow[34]);
                                     }
+                                //若为空的值就根据指定字段设置为 "" 或 0
                                     else
                                     {
-                                        newrow[j] = mdt.Rows[i][j];
+                                        if (mdt.Rows[i][j].ToString() == "")
+                                        {
+                                            if (k3Colname.Contains("F_YTC_TEXT") || k3Colname.Contains("F_YTC_REMARK") || k3Colname.Contains("F_YTC_ASSISTANT"))
+                                            {
+                                                newrow[j] = "";
+                                            }
+                                            else if (k3Colname.Contains("F_YTC_DECIMAL") || k3Colname.Contains("F_YTC_BASE"))
+                                            {
+                                                newrow[j] = 0;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            newrow[j] = mdt.Rows[i][j];
+                                        }
                                     }
                                     break;
                             }
@@ -592,7 +597,7 @@ namespace K3MaterialGeneralTool.Task
                     }
                     tempdt.Rows.Add(newrow);
                 }
-                
+
                 //最后将dtname及对应的内容进行插入
                 ImportDtToDb(0,dtname,tempdt);
             }
