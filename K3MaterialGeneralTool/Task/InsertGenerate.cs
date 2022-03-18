@@ -472,6 +472,11 @@ namespace K3MaterialGeneralTool.Task
                             {
                                 newrow[j] = Convert.ToDecimal(colvalue);
                             }
+                            //change date:20220318 在T_BD_MATERIAL表,若循环到 F_YTC_DECIMAL(罐/箱) 即将记录赋值至 F_YTC_DECIMAL3(包装系数)内
+                            else if (dtname== "T_BD_MATERIAL" && k3Colname== "F_YTC_DECIMAL" && j==48)
+                            {
+                                newrow[j] = Convert.ToDecimal(colvalue);
+                            }
                             else
                             {
                                 newrow[j] = colvalue;

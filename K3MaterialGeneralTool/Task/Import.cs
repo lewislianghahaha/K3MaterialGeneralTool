@@ -55,8 +55,8 @@ namespace K3MaterialGeneralTool.Task
                 //定义列数(注:此总列次必须与EXCEL中的总列数一致) 同过dt获取总列数
                 var colnum = dt.Columns.Count;
 
-                //创建完标题后,开始从第三行起读取对应列的值(因为EXCEL模板前两行都是标题信息,从第三行开始才是内容)
-                for (var r = 2; r <= sheet.LastRowNum; r++)
+                //创建完标题后,开始从第二行起读取对应列的值(因为EXCEL模板前两行都是标题信息,从第三行开始才是内容)
+                for (var r = 1; r <= sheet.LastRowNum; r++)
                 {
                     var result = false;
                     var dr = dt.NewRow();

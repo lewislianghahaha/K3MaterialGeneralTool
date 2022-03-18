@@ -713,7 +713,9 @@
                                    F_YTC_BASE2 ,F_YTC_BASE3 ,F_YTC_TEXT9 ,F_YTC_DECIMAL7 ,F_YTC_DECIMAL8 ,
                                    F_YTC_TEXT8 ,F_YTC_TEXT7 ,F_YTC_TEXT6 ,F_YTC_TEXT5 ,F_YTC_ASSISTANT8 ,
                                    F_YTC_TEXT4 ,F_YTC_TEXT3 ,F_YTC_TEXT10 ,F_YTC_TEXT11 ,F_YTC_REMARK2 ,
-                                   F_YTC_REMARK3,F_YTC_REMARK4,F_YTC_REMARK5,F_YTC_ASSISTANT9,F_YTC_DECIMAL9,F_YTC_TEXT12
+                                   F_YTC_REMARK3,F_YTC_REMARK4,F_YTC_REMARK5,F_YTC_ASSISTANT9,F_YTC_DECIMAL9,
+                                   F_YTC_TEXT12,F_YTC_TEXT13,
+                                   F_YTC_TEXT14,F_YTC_TEXT15,F_YTC_TEXT16,F_YTC_TEXT17
                             FROM dbo.T_BD_MATERIAL
                             WHERE FMATERIALID='{fmaterialid}'
                         ";
