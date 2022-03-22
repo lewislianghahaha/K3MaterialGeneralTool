@@ -180,7 +180,7 @@ namespace K3MaterialGeneralTool.Task
                         //根据循环的i值及oldmaterialid获取数据源
                         var materialdt = search.Get_SearchMaterialSourceAndCreateTemp(i, oldmaterialid);
 
-                        //判断若materialdt返回的行数为0,即不用继续
+                        //判断若materialdt返回的行数为0,即跳出当前循环至下一个循环
                         if(materialdt.Rows.Count==0) continue;
 
                         //根据materialdt动态生成对应表格的临时表
@@ -237,7 +237,7 @@ namespace K3MaterialGeneralTool.Task
                             _salesunit = Convert.ToInt32(materialdt.Rows[0][2]);
                         }
 
-                        //将materialdt tempdt keyid放至方法内进行选择插入,并返回bool,若为false,即跳转至CreateGenerateRecord()并break,loopmark为false
+                        //将materialdt tempdt keyid放至方法内进行选择插入,并返回bool,若为false,即跳转至CreateGenerateRecord()并break(跳出所有循环),loopmark为false
                         if (!MakeRecordToDb(i,materialdt, tempdt, exceltempdt, dtname, binddt))
                         {
                             CreateGenerateRecord(rows,1,$@"物料编码:'{Convert.ToString(rows[1])}'不能成功插入,原因:插入'{dtname}'表时出现'{_errmessage}'异常,请联系管理员");
@@ -251,6 +251,8 @@ namespace K3MaterialGeneralTool.Task
                     {
                         //当检测到loopmark为false时,即使用keyid为条件,将已插入的表格进行删除
                         search.DelNewMaterialRecord(_newmaterialid);
+                        //change date:20220322 修正当执行完删除操作后,就会loopmark初始化,将false更新为True值
+                        loopmark = true;
                         continue;
                     }
                     //执行‘单位换算’表相关内容插入
@@ -395,6 +397,8 @@ namespace K3MaterialGeneralTool.Task
         private bool MakeRecordToDb(int tabid,DataTable mdt, DataTable tempdt,DataTable exceltempdt,string dtname,DataTable binddt)
         {
             var result = true;
+            //定义K3列名
+            var k3Colname = string.Empty;
 
             try
             {
@@ -417,7 +421,7 @@ namespace K3MaterialGeneralTool.Task
                     for (var j = 0; j < mdt.Columns.Count; j++)
                     {
                         //获取K3列名
-                        var k3Colname = mdt.Columns[j].ColumnName;
+                        k3Colname = mdt.Columns[j].ColumnName;
                         //若dtname为'T_BD_MATERIAL'时,J=0即将keyid赋给newrow[j];若为其余11个表,即需要当j=0 1时,
                         //分别将keyid(本表新主键) newmaterialid(对应T_BD_MATERIAL新主键)进行赋值
                         if (dtname == "T_BD_MATERIAL")
@@ -470,7 +474,7 @@ namespace K3MaterialGeneralTool.Task
                             }
                             else if (k3Colname=="F_YTC_DECIMAL" || k3Colname=="FNETWEIGHT")
                             {
-                                newrow[j] = Convert.ToDecimal(colvalue);
+                                newrow[j] = colvalue == "" ? 0 : Convert.ToDecimal(colvalue);
                             }
                             else
                             {
@@ -603,7 +607,7 @@ namespace K3MaterialGeneralTool.Task
             }
             catch (Exception ex)
             {
-                _errmessage = ex.Message;
+                _errmessage = "字段:"+k3Colname+ex.Message;
                 result = false;
             }
 
