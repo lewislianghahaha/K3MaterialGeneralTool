@@ -267,16 +267,9 @@
                             UNION ALL
 
                             --物料分组
-                            SELECT 15 TYPEID,convert(varchar(100),B.FID) ID,A.FNUMBER+'('+B.FNAME+')' NAME,GETDATE() CreateDt
+                            SELECT 15 TYPEID,convert(varchar(100),B.FID) ID,/*A.FNUMBER+'('+B.FNAME+')'*/ A.FNUMBER NAME,GETDATE() CreateDt
                             FROM dbo.T_BD_MATERIALGROUP A
                             INNER JOIN dbo.T_BD_MATERIALGROUP_L B ON A.FID=B.FID AND B.FLOCALEID=2052
-
-                            /*SELECT /*A.FNUMBER 父编码,*/15 TYPEID,convert(varchar(100),B.FID) ID,B.FNUMBER+'('+C.FNAME+')' NAME,GETDATE() CreateDt
-                            FROM dbo.T_BD_MATERIALGROUP A
-                            INNER JOIN dbo.T_BD_MATERIALGROUP B ON A.FID=B.FPARENTID
-                            INNER JOIN dbo.T_BD_MATERIALGROUP_L C ON B.FID=C.FID AND C.FLOCALEID=2052
-                            WHERE a.FPARENTID=0*/
-                            --ORDER BY A.FID
 
                             UNION ALL
 
