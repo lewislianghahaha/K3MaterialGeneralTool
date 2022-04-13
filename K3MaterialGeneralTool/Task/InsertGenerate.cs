@@ -576,7 +576,12 @@ namespace K3MaterialGeneralTool.Task
                                     {
                                         newrow[j] = Convert.ToDecimal(newrow[34]);
                                     }
-                                //若为空的值就根据指定字段设置为 "" 或 0
+                                    //change date:20220413 将T_BD_MATERIALSTOCK中的FSAFESTOCK(安全库存 j=36) 与 FMAXSTOCK(最大库存 j=39) 一致
+                                    else if (dtname == "T_BD_MATERIALSTOCK" && j==39)
+                                    {
+                                        newrow[j] = Convert.ToDecimal(newrow[36]);
+                                    }
+                                    //若为空的值就根据指定字段设置为 "" 或 0
                                     else
                                     {
                                         if (mdt.Rows[i][j].ToString() == "")
