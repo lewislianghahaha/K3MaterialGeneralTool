@@ -23,6 +23,7 @@
 
         /// <summary>
         /// K3字段绑定记录(在'绑定'功能显示及更新时使用)
+        /// T_MAT_BindK3Col 中 Typeid=>0:基本 1:库存 2:销售 
         /// </summary>
         /// <returns></returns>
         public string Get_SearchBindK3Col(int typeid)

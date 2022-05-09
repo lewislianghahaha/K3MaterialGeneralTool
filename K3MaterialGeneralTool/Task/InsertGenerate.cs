@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using K3MaterialGeneralTool.DB;
@@ -25,6 +26,8 @@ namespace K3MaterialGeneralTool.Task
         private string _sqlscript = string.Empty;
         //记录生成时的记录集(注:最后将此记录集插入至GlobalClasscs.RDt.Resultdt内)
         private DataTable _resultdt;   
+        //记录T_BD_MATERIAL中的F_YTC_ASSISTANT5记录(用于T_BD_MATERIALSTROCK中的‘启用批号管理’及‘批号编码规则’设定)
+        private string _futype;
 
         /// <summary>
         /// 将数据插入至T_MAT_BindRecord表内
@@ -124,7 +127,7 @@ namespace K3MaterialGeneralTool.Task
         #region 生成K3新物料相关
 
         /// <summary>
-        /// 生成K3新物料
+        /// 生成K3新物料(重)
         /// </summary>
         /// <param name="importdt"></param>
         /// <returns></returns>
@@ -263,6 +266,8 @@ namespace K3MaterialGeneralTool.Task
                     MakeUnitRecordToDb(_salesunit, excelmatcode, nkg,kui);
                     //最后若成功生成,并将rows插入至CreateGenerateRecord()内
                     CreateGenerateRecord(rows,0,"");
+                    //最后对_futype变量进行清空,便于下一个循环使用 change date:20220509
+                    _futype = "";
                 }
 
                 //1)将_resultdt插入T_MAT_ImportHistoryRecord表内 2) 最后将结果集添加至GlobalClasscs.RDt.Resultdt内
@@ -571,16 +576,39 @@ namespace K3MaterialGeneralTool.Task
 
                                 //检测若mdt.rows[i][j]为空值,若对应的列名包含F_YTC_TEXT F_YTC_REMARK F_YTC_ASSISTANT的就返回"",若包含F_YTC_DECIMAL F_YTC_BASE的就返回0;若正常即直接赋值
                                 default:
-                                //change date:20220318 在T_BD_MATERIAL表,若循环到  F_YTC_DECIMAL3(包装系数) [48] 即将F_YTC_DECIMAL(罐/箱) [34]记录进行赋值
+                                    //change date:20220318 在T_BD_MATERIAL表,若循环到  F_YTC_DECIMAL3(包装系数) [48] 即将F_YTC_DECIMAL(罐/箱) [34]记录进行赋值
                                     if (dtname == "T_BD_MATERIAL" && j == 48)
                                     {
                                         newrow[j] = Convert.ToDecimal(newrow[34]);
                                     }
+
+                                    //change date:20220509 先记录T_BD_MATERIAL中‘物料分组(辅助)值’ (用于T_BD_MATERIALSTROCK中的‘启用批号管理’及‘批号编码规则’设定)
+                                    else if (dtname=="T_BD_MATERIAL" && j==41)
+                                    {
+                                        _futype = Convert.ToString(mdt.Rows[i][j]);
+                                    }
+                                    //change date:20220509 判断_futype是否为"571f36cd14afe0"(产成品),若"是",就将"启用批号管理"选项设置为'1'即勾上
+                                    else if (dtname== "T_BD_MATERIALSTOCK" && j==14 && _futype== "571f36cd14afe0")
+                                    {
+                                        newrow[j] = 1;
+                                    }
+                                    //change date:20220509 判断_futype是否为"571f36cd14afe0"(产成品),若"是",就将"批号编码规则"设置为'生产入库批号规则'(203465)
+                                    else if (dtname== "T_BD_MATERIALSTOCK" && j==15 && _futype== "571f36cd14afe0")
+                                    {
+                                        newrow[j] = 203465;
+                                    }
+                                    //change date:20220509 将T_BD_MATERIALBASE中‘默认税率’修改为234(13%增值税)
+                                    else if (dtname == "T_BD_MATERIALBASE" && j == 15)
+                                    {
+                                        newrow[j] = 234;
+                                    }
+
                                     //change date:20220413 将T_BD_MATERIALSTOCK中的FSAFESTOCK(安全库存 j=36) 与 FMAXSTOCK(最大库存 j=39) 一致
                                     else if (dtname == "T_BD_MATERIALSTOCK" && j==39)
                                     {
                                         newrow[j] = Convert.ToDecimal(newrow[36]);
                                     }
+
                                     //若为空的值就根据指定字段设置为 "" 或 0
                                     else
                                     {
@@ -630,6 +658,7 @@ namespace K3MaterialGeneralTool.Task
             string result;
 
             //根据excecolname跳转至不同的方法进行获取相关ID值,若不用查找对应ID值的列,即将excecolvalue赋给result变量
+
             //若excecolname包含'原漆',就跳转至SearchK3BinRecord()方法
             if (excecolname == "原漆物料名称")
             {
@@ -637,12 +666,14 @@ namespace K3MaterialGeneralTool.Task
                 result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : "";
             }
             //若excecolname包含0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
-            //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位 19:化学品分类,就跳转至SearchSourceRecord()方法
+            //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位(库存单位,销售单位,销售计价单位) 19:化学品分类,
+            //就跳转至SearchSourceRecord()方法
             else if (excecolname == "品牌" || excecolname =="分类" || excecolname =="品类" ||excecolname =="组份" || 
                     excecolname == "干燥性" || excecolname =="工业项目名称(常规/定制)" || excecolname =="是否为阻击产品" || excecolname == "颜色" || 
                     excecolname =="系数" || excecolname =="水性油性" || excecolname =="原漆半成品属性" || excecolname == "开票信息" || 
                     excecolname =="研发类别" || excecolname =="包装罐" || excecolname =="包装箱" || excecolname == "物料分组(辅助)" || 
-                    excecolname =="物料分组" || excecolname=="存货类别" || excecolname=="默认税率" || excecolname== "基本单位" || excecolname== "化学品分类")
+                    excecolname =="物料分组" || excecolname=="存货类别" || excecolname=="默认税率" || excecolname== "基本单位" || excecolname== "化学品分类"
+                    || excecolname == "库存单位" || excecolname== "销售单位" || excecolname== "销售计价单位")
             {
                 var typeid = 0;
 
@@ -723,7 +754,7 @@ namespace K3MaterialGeneralTool.Task
                 {
                     typeid = 17;
                 }
-                else if (excecolname =="基本单位")
+                else if (excecolname =="基本单位" || excecolname== "库存单位" || excecolname== "销售单位" || excecolname== "销售计价单位")
                 {
                     typeid = 18;
                 }

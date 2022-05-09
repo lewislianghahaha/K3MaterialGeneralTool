@@ -78,6 +78,7 @@ namespace K3MaterialGeneralTool.Task
 
         /// <summary>
         /// K3字段绑定记录(在'绑定'功能显示及更新时使用)
+        /// Typeid=>0:基本 1:库存 2:销售 
         /// </summary>
         /// <returns></returns>
         public DataTable SearchK3BindRecord(int typeid)
