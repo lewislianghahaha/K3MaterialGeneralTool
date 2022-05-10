@@ -586,6 +586,7 @@ namespace K3MaterialGeneralTool.Task
                                     else if (dtname=="T_BD_MATERIAL" && j==41)
                                     {
                                         _futype = Convert.ToString(mdt.Rows[i][j]);
+                                        newrow[j]= mdt.Rows[i][j];
                                     }
                                     //change date:20220509 判断_futype是否为"571f36cd14afe0"(产成品),若"是",就将"启用批号管理"选项设置为'1'即勾上
                                     else if (dtname== "T_BD_MATERIALSTOCK" && j==14 && _futype== "571f36cd14afe0")
