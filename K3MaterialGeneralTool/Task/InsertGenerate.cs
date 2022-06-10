@@ -234,11 +234,11 @@ namespace K3MaterialGeneralTool.Task
                         }
                         #endregion
 
-                        //当dtname="T_BD_MATERIALSALE"时,获取materialdt.rows[0][2]的值并赋给salesunit变量;‘单位换算’表使用
-                        if (dtname == "t_BD_MaterialSale")
-                        {
-                            _salesunit = Convert.ToInt32(materialdt.Rows[0][2]);
-                        }
+                        ////当dtname="T_BD_MATERIALSALE"时,获取materialdt.rows[0][2]的值并赋给salesunit变量;‘单位换算’表使用
+                        //if (dtname == "t_BD_MaterialSale")
+                        //{
+                        //    _salesunit = Convert.ToInt32(materialdt.Rows[0][2]);
+                        //}
 
                         //将materialdt tempdt keyid放至方法内进行选择插入,并返回bool,若为false,即跳转至CreateGenerateRecord()并break(跳出所有循环),loopmark为false
                         if (!MakeRecordToDb(i,materialdt, tempdt, exceltempdt, dtname, binddt))
@@ -610,6 +610,24 @@ namespace K3MaterialGeneralTool.Task
                                         newrow[j] = Convert.ToDecimal(newrow[36]);
                                     }
 
+                                    //change date:20220610: 将_salesunit(销售单位) 的值放到以下各项
+                                    //生产(T_BD_MATERIALPRODUCE)->生产单位(FPRODUCEUNITID)[3]  最小发料批量单位(FMINISSUEUNITID)[39]
+                                    else if (dtname== "T_BD_MATERIALPRODUCE" && j==3 || dtname == "T_BD_MATERIALPRODUCE" && j ==39)
+                                    {
+                                        newrow[j] =_salesunit;
+                                    }
+                                    //采购(T_BD_MATERIALPURCHASE)->采购单位(FPURCHASEUNITID)[2] 采购计价单位(FPURCHASEPRICEUNITID)[3]
+                                    else if (dtname== "T_BD_MATERIALPURCHASE" && j==2 || dtname == "T_BD_MATERIALPURCHASE" && j == 3)
+                                    {
+                                        newrow[j] = _salesunit;
+                                    }
+                                    //委外(T_BD_MATERIALSUBCON)->委外单位(FSUBCONUNITID)[2] 委外计价单位(FSUBCONPRICEUNITID)[3]
+                                    else if (dtname == "T_BD_MATERIALSUBCON" && j == 2 || dtname == "T_BD_MATERIALSUBCON" && j == 3)
+                                    {
+                                        newrow[j] = _salesunit;
+                                    }
+
+
                                     //若为空的值就根据指定字段设置为 "" 或 0
                                     else
                                     {
@@ -766,7 +784,11 @@ namespace K3MaterialGeneralTool.Task
                 #endregion
 
                 var dt = search.SearchSourceRecord(typeid, excecolvalue);
+
                 result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : "";
+                //如果excecolname==“销售单位”,将返回值除了赋给result外,再赋值给_salesunit
+                if (excecolname == "销售单位")
+                    _salesunit = Convert.ToInt32(result);
             }
             //若excecolname包含'U订货商品分类',即调用XXX方法;注:若返回结果多于1行,即返回null值至result变量
             else if (excecolname =="U订货商品分类")
