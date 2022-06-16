@@ -325,6 +325,7 @@ namespace K3MaterialGeneralTool.Task
         /// <param name="kui">规格型号-来源excel内容</param>
         private void MakeUnitRecordToDb(int salesunit,string excelmatcode,decimal nkg,string kui)
         {
+            var materialcode = string.Empty;
             var fenzi = new decimal();
             //获取‘单位换算’临时表
             var tempdt = tempDtList.CreateK3ImportTempDt(12);
@@ -336,7 +337,9 @@ namespace K3MaterialGeneralTool.Task
                 var unitid = search.MakeDtidKey(12);
 
                 //将‘物料编码’截图前8位+{{{{{0}}}结合
-                var materialcode = excelmatcode.Substring(0, 7);
+                //添加判断‘excel物料编码’长度,若小于8个,即不用截取
+                materialcode = excelmatcode.Length < 8 ? excelmatcode : excelmatcode.Substring(0, 7);
+
                 var checkvalue = materialcode + "{{{{{0}}}";
 
                 //创建(更新)T_BAS_BILLCODES(编码规则最大编码表)中的相关记录-FBILLNO字段使用
@@ -589,40 +592,42 @@ namespace K3MaterialGeneralTool.Task
                                         newrow[j]= mdt.Rows[i][j];
                                     }
                                     //change date:20220509 判断_futype是否为"571f36cd14afe0"(产成品),若"是",就将"启用批号管理"选项设置为'1'即勾上
-                                    else if (dtname== "T_BD_MATERIALSTOCK" && j==14 && _futype== "571f36cd14afe0")
+                                    else if (dtname== "t_BD_MaterialStock" && j==14 && _futype== "571f36cd14afe0")
                                     {
+                                        //var a = _futype;
                                         newrow[j] = 1;
                                     }
                                     //change date:20220509 判断_futype是否为"571f36cd14afe0"(产成品),若"是",就将"批号编码规则"设置为'生产入库批号规则'(203465)
-                                    else if (dtname== "T_BD_MATERIALSTOCK" && j==15 && _futype== "571f36cd14afe0")
+                                    else if (dtname== "t_BD_MaterialStock" && j==15 && _futype== "571f36cd14afe0")
                                     {
+                                        //var a = _futype;
                                         newrow[j] = 203465;
                                     }
                                     //change date:20220509 将T_BD_MATERIALBASE中‘默认税率’修改为234(13%增值税)
-                                    else if (dtname == "T_BD_MATERIALBASE" && j == 15)
+                                    else if (dtname == "t_BD_MaterialBase" && j == 15)
                                     {
                                         newrow[j] = 234;
                                     }
 
                                     //change date:20220413 将T_BD_MATERIALSTOCK中的FSAFESTOCK(安全库存 j=36) 与 FMAXSTOCK(最大库存 j=39) 一致
-                                    else if (dtname == "T_BD_MATERIALSTOCK" && j==39)
+                                    else if (dtname == "t_BD_MaterialStock" && j==39)
                                     {
                                         newrow[j] = Convert.ToDecimal(newrow[36]);
                                     }
 
                                     //change date:20220610: 将_salesunit(销售单位) 的值放到以下各项
                                     //生产(T_BD_MATERIALPRODUCE)->生产单位(FPRODUCEUNITID)[3]  最小发料批量单位(FMINISSUEUNITID)[39]
-                                    else if (dtname== "T_BD_MATERIALPRODUCE" && j==3 || dtname == "T_BD_MATERIALPRODUCE" && j ==39)
+                                    else if (dtname== "t_BD_MaterialProduce" && j==3 || dtname == "t_BD_MaterialProduce" && j ==39)
                                     {
                                         newrow[j] =_salesunit;
                                     }
                                     //采购(T_BD_MATERIALPURCHASE)->采购单位(FPURCHASEUNITID)[2] 采购计价单位(FPURCHASEPRICEUNITID)[3]
-                                    else if (dtname== "T_BD_MATERIALPURCHASE" && j==2 || dtname == "T_BD_MATERIALPURCHASE" && j == 3)
+                                    else if (dtname== "t_bd_MaterialPurchase" && j==2 || dtname == "t_bd_MaterialPurchase" && j == 3)
                                     {
                                         newrow[j] = _salesunit;
                                     }
                                     //委外(T_BD_MATERIALSUBCON)->委外单位(FSUBCONUNITID)[2] 委外计价单位(FSUBCONPRICEUNITID)[3]
-                                    else if (dtname == "T_BD_MATERIALSUBCON" && j == 2 || dtname == "T_BD_MATERIALSUBCON" && j == 3)
+                                    else if (dtname == "t_bd_MaterialSubcon" && j == 2 || dtname == "t_bd_MaterialSubcon" && j == 3)
                                     {
                                         newrow[j] = _salesunit;
                                     }
