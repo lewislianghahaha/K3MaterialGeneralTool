@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using K3MaterialGeneralTool.DB;
@@ -631,7 +630,11 @@ namespace K3MaterialGeneralTool.Task
                                     {
                                         newrow[j] = _salesunit;
                                     }
-
+                                    //change date:20220802:当‘标签配比’[77]不为空时,将启用标签配比[81] 设置为1(已启用)
+                                    else if (dtname == "T_BD_MATERIAL" && j==81)
+                                    {
+                                        newrow[j] = Convert.ToString(newrow[77]).Length > 0 ? 1 : 0;
+                                    }
 
                                     //若为空的值就根据指定字段设置为 "" 或 0
                                     else
