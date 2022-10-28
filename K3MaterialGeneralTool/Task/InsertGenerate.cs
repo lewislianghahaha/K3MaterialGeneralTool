@@ -635,6 +635,11 @@ namespace K3MaterialGeneralTool.Task
                                     {
                                         newrow[j] = Convert.ToString(newrow[77]).Length > 0 ? 1 : 0;
                                     }
+                                    //change date 20221029 将生产-> “生产单位”[3] 更新到 “子项单位”[4]
+                                    else if (dtname== "t_BD_MaterialProduce" && j==4)
+                                    {
+                                        newrow[j] = Convert.ToInt32(newrow[3]);
+                                    }
 
                                     //若为空的值就根据指定字段设置为 "" 或 0
                                     else
