@@ -406,13 +406,17 @@ namespace K3MaterialGeneralTool.Task
             var result = true;
             //定义K3列名
             var k3Colname = string.Empty;
+            DataRow[] xuanrows;
 
             try
             {
                 //根据EXCEL-‘包装罐’查询相关记录
                 var guanrows = _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][5]) + "'");
                 //根据EXCEL-‘包装箱’查询相关记录
-                var xuanrows = _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][6]) + "'");
+                //todo:如Rows[0][5]是包含了‘桶’，即也是用Rows[0][5]作为条件进行查询,并赋值至xuanrows内
+                //todo:反之使用exceltempdt.Rows[0][6]为条件进行查询
+                xuanrows = Convert.ToString(exceltempdt.Rows[0][5]).Contains("") ? _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][5]) + "'") 
+                          : _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][6]) + "'");
 
                 //循环mdt数据源-行
                 for (var i = 0; i < mdt.Rows.Count; i++)
