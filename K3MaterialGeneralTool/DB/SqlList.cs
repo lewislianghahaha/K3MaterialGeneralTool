@@ -306,6 +306,14 @@
                             INNER JOIN dbo.T_BAS_ASSISTANTDATAENTRY_L b ON a.FENTRYID=b.FENTRYID
                             WHERE a.FID='6139bef6827423'--a.FENTRYID='6139bf1682743f'
 
+                            UNION ALL
+                            
+                            --安全标签类别
+                            SELECT 20 TYPEID,b.FENTRYID ID,b.FDATAVALUE NAME,GETDATE() CreateDt
+                            FROM T_BAS_ASSISTANTDATAENTRY  a
+                            INNER JOIN dbo.T_BAS_ASSISTANTDATAENTRY_L b ON a.FENTRYID=b.FENTRYID
+                            WHERE a.FID='637d95876cc455'
+
                             )X
                         ";
             return _result;
@@ -709,7 +717,7 @@
                                    F_YTC_TEXT4 ,F_YTC_TEXT3 ,F_YTC_TEXT10 ,F_YTC_TEXT11 ,F_YTC_REMARK2 ,
                                    F_YTC_REMARK3,F_YTC_REMARK4,F_YTC_REMARK5,F_YTC_ASSISTANT9,F_YTC_DECIMAL9,
                                    F_YTC_TEXT12,F_YTC_TEXT13,
-                                   F_YTC_TEXT14,F_YTC_TEXT15,F_YTC_TEXT16,F_YTC_TEXT17,F_YTC_DECIMAL10,F_YTC_CHECKBOX
+                                   F_YTC_TEXT14,F_YTC_TEXT15,F_YTC_TEXT16,F_YTC_TEXT17,F_YTC_DECIMAL10,F_YTC_CHECKBOX,F_YTC_TEXT18,F_YTC_TEXT19,F_YTC_ASSISTANT10
                             FROM dbo.T_BD_MATERIAL
                             WHERE FMATERIALID='{fmaterialid}'
                         ";

@@ -413,8 +413,8 @@ namespace K3MaterialGeneralTool.Task
                 //根据EXCEL-‘包装罐’查询相关记录
                 var guanrows = _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][5]) + "'");
                 //根据EXCEL-‘包装箱’查询相关记录
-                //todo:如Rows[0][5]是包含了‘桶’，即也是用Rows[0][5]作为条件进行查询,并赋值至xuanrows内
-                //todo:反之使用exceltempdt.Rows[0][6]为条件进行查询
+                //如Rows[0][5]是包含了‘桶’，即也是用Rows[0][5]作为条件进行查询,并赋值至xuanrows内
+                //反之使用exceltempdt.Rows[0][6]为条件进行查询
                 xuanrows = Convert.ToString(exceltempdt.Rows[0][5]).Contains("桶") ? _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][5]) + "'") 
                           : _guandt.Select("名称='" + Convert.ToString(exceltempdt.Rows[0][6]) + "'");
 
@@ -463,6 +463,11 @@ namespace K3MaterialGeneralTool.Task
                         //使用k3Colname及k3Tablename查询是否有绑定关系;若有就获取对应的值;若没有将使用旧记录赋值给对应的项内
                         //根据k3Colname及k3Tablename查在bindt内找出对应的‘Excel字段名称’
                         var dtlrows = binddt.Select("K3列名='" + k3Colname + "' and K3表名='" + dtname + "'");
+
+                        if (k3Colname == "F_YTC_ASSISTANT10")
+                        {
+                            var a = 1;
+                        }
 
                         if (dtlrows.Length > 0)
                         {
@@ -702,14 +707,14 @@ namespace K3MaterialGeneralTool.Task
                 result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : "";
             }
             //若excecolname包含0:品牌 1:分类 2:品类 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
-            //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位(库存单位,销售单位,销售计价单位) 19:化学品分类,
+            //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位(库存单位,销售单位,销售计价单位) 19:化学品分类,20:安全标签类别
             //就跳转至SearchSourceRecord()方法
             else if (excecolname == "品牌" || excecolname =="分类" || excecolname =="品类" ||excecolname =="组份" || 
                     excecolname == "干燥性" || excecolname =="工业项目名称(常规/定制)" || excecolname =="是否为阻击产品" || excecolname == "颜色" || 
                     excecolname =="系数" || excecolname =="水性油性" || excecolname =="原漆半成品属性" || excecolname == "开票信息" || 
                     excecolname =="研发类别" || excecolname =="包装罐" || excecolname =="包装箱" || excecolname == "物料分组(辅助)" || 
                     excecolname =="物料分组" || excecolname=="存货类别" || excecolname=="默认税率" || excecolname== "基本单位" || excecolname== "化学品分类"
-                    || excecolname == "库存单位" || excecolname== "销售单位" || excecolname== "销售计价单位")
+                    || excecolname == "库存单位" || excecolname== "销售单位" || excecolname== "销售计价单位" || excecolname== "安全标签类别")
             {
                 var typeid = 0;
 
@@ -797,6 +802,10 @@ namespace K3MaterialGeneralTool.Task
                 else if (excecolname == "化学品分类")
                 {
                     typeid = 19;
+                }
+                else if (excecolname == "安全标签类别")
+                {
+                    typeid = 20;
                 }
                 #endregion
 
