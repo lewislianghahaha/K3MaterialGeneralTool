@@ -464,10 +464,10 @@ namespace K3MaterialGeneralTool.Task
                         //根据k3Colname及k3Tablename查在bindt内找出对应的‘Excel字段名称’
                         var dtlrows = binddt.Select("K3列名='" + k3Colname + "' and K3表名='" + dtname + "'");
 
-                        if (k3Colname == "F_YTC_ASSISTANT10")
-                        {
-                            var a = 1;
-                        }
+                        //if (k3Colname == "F_YTC_ASSISTANT10")
+                        //{
+                        //    var a = 1;
+                        //}
 
                         if (dtlrows.Length > 0)
                         {
@@ -648,6 +648,11 @@ namespace K3MaterialGeneralTool.Task
                                     else if (dtname== "t_BD_MaterialProduce" && j==4)
                                     {
                                         newrow[j] = Convert.ToInt32(newrow[3]);
+                                    }
+                                    //todo:change date:20221212 添加'国际HSCODE'新字段
+                                    else if (dtname == "F_ytc_Text20" && j ==85)
+                                    {
+                                        newrow[j] = Convert.ToString(exceltempdt.Rows[0][32]);
                                     }
 
                                     //若为空的值就根据指定字段设置为 "" 或 0
