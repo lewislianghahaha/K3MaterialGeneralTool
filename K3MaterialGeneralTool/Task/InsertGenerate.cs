@@ -492,6 +492,25 @@ namespace K3MaterialGeneralTool.Task
                             {
                                 newrow[j] = colvalue == "" ? 0 : Convert.ToDecimal(colvalue);
                             }
+                            //todo: change date:20230504 若EXCEL中的‘物料所属部门’(24)=‘大客户部’ 即 标签名称(34) 标签代码(33) 以及 标签图号(35) 取 EXCEL对应的值
+                            else if (k3Colname== "F_YTC_TEXT1")  //标签名称
+                            {
+                                newrow[j] = Convert.ToString(exceltempdt.Rows[0][24]) == "大客户部"
+                                    ? colvalue
+                                    : GetMaterialNameAndCode(0, Convert.ToString(exceltempdt.Rows[0][2]));
+                            }
+                            else if (k3Colname == "F_YTC_TEXT2")  //标签代码
+                            {
+                                newrow[j] = Convert.ToString(exceltempdt.Rows[0][24]) == "大客户部"
+                                        ? colvalue
+                                        : GetMaterialNameAndCode(1, Convert.ToString(exceltempdt.Rows[0][2]));
+                            }
+                            else if (k3Colname == "F_YTC_TEXT21") //标签图号
+                            {
+                                newrow[j] = Convert.ToString(exceltempdt.Rows[0][24]) == "大客户部"
+                                        ? colvalue
+                                        : " ";
+                            }
                             else
                             {
                                 newrow[j] = colvalue;
@@ -535,28 +554,6 @@ namespace K3MaterialGeneralTool.Task
                                         var endid = Convert.ToString(mdt.Rows[i][j]).LastIndexOf(",", StringComparison.Ordinal) + 1;
                                         newrow[j] = Convert.ToString(mdt.Rows[i][j]).Substring(0,endid) + Convert.ToString(exceltempdt.Rows[0][1]);
                                     }
-                                    break;
-                                //todo:change date:20230504 若EXCEL中的‘物料所属部门’(24)=‘大客户部’ 即 标签名称(34) 标签代码(33) 以及 标签图号(35) 取 EXCEL对应的值
-                                case "F_YTC_TEXT1":      //标签名称
-                                   // var a = Convert.ToString(exceltempdt.Rows[0][24]);
-                                    newrow[j] = Convert.ToString(exceltempdt.Rows[0][24]) == "大客户部"
-                                        ? Convert.ToString(exceltempdt.Rows[0][34])
-                                        : GetMaterialNameAndCode(0, Convert.ToString(exceltempdt.Rows[0][2]));
-
-                                    break;
-                                case "F_YTC_TEXT2":      //标签代码
-
-                                    newrow[j] = Convert.ToString(exceltempdt.Rows[0][24]) == "大客户部"
-                                        ? Convert.ToString(exceltempdt.Rows[0][33])
-                                        : GetMaterialNameAndCode(1, Convert.ToString(exceltempdt.Rows[0][2]));
-
-                                    break;
-                                case "F_YTC_TEXT21":     //标签图号
-
-                                    newrow[j] = Convert.ToString(exceltempdt.Rows[0][24]) == "大客户部"
-                                        ? Convert.ToString(exceltempdt.Rows[0][35])
-                                        : " ";
-
                                     break;
                                 //将系数 干燥性 颜色 U订货商品编码清空
                                 case "F_YTC_ASSISTANT2":      //系数
