@@ -725,7 +725,7 @@ namespace K3MaterialGeneralTool.Task
                 result = dt.Rows.Count == 1 ? Convert.ToString(dt.Rows[0][0]) : "";
             }
             //若excecolname包含0:品牌 1:分类(一级分类) 2:品类(二级分类) 3:组份 4:干燥性 5:常规/订制 6:阻击产品 7:颜色 8:系数 9:水性油性 10:原漆半成品属性 11:开票信息 12:研发类别
-            //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位(库存单位,销售单位,销售计价单位) 19:化学品分类,20:安全标签类别
+            //13:包装罐(包装箱) 14:物料分组(辅助) 15:物料分组 16:存货类别 17:默认税率 18:基本单位(库存单位,销售单位,销售计价单位) 19:化学品分类,20:安全标签类别,21:领域
             //就跳转至SearchSourceRecord()方法
             else if (excecolname == "品牌" || excecolname =="一级分类" || excecolname == "二级分类" || excecolname =="组份" || 
                     excecolname == "干燥性" || excecolname =="工业项目名称(常规/定制)" || excecolname =="是否为阻击产品" || excecolname == "颜色" || 
