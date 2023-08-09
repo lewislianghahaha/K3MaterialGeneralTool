@@ -382,7 +382,7 @@ namespace K3MaterialGeneralTool.Task
                 newrow[18] = 0;                                                  //FFORBIDDERID
                 newrow[19] = DateTime.Now.Date;                                  //FFORBIDDATE
                 newrow[20] = "A";                                                //FDOCUMENTSTATUS
-                newrow[21] = "";                                                 //FFORBIDSTATUS
+                newrow[21] = "A";                                                //FFORBIDSTATUS
                 newrow[22] = -1;                                                 //FUNITID
 
                 tempdt.Rows.Add(newrow);
