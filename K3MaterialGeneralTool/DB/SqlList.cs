@@ -919,7 +919,7 @@
             _result = $@"
                             IF NOT EXISTS (SELECT 1 FROM T_BAS_BILLCODES WHERE (FRULEID = 'eeb39bd33e0441d789661e1a7e8944f0' AND FBYVALUE = N'{fmaterialnumber}'))
                             BEGIN
-                            INSERT INTO T_BAS_BILLCODES SELECT ISNULL(max(fcodeid), 0) + 1, 'eeb39bd33e0441d789661e1a7e8944f0', N'{fmaterialnumber}', 1.0000000000 FROM T_BAS_BILLCODES
+                            INSERT INTO T_BAS_BILLCODES SELECT ISNULL(max(fcodeid), 0) + 1, 'eeb39bd33e0441d789661e1a7e8944f0', N'{fmaterialnumber}', 1.0000000000,NULL,'' FROM T_BAS_BILLCODES
                             END
                             ELSE
                             BEGIN

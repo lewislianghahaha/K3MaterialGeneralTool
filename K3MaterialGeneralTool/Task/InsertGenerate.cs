@@ -275,8 +275,9 @@ namespace K3MaterialGeneralTool.Task
                 //若samematerialidlist有值,即执行删除操作(已取消;change date:20211122)
                 //if (samematerialiddt.Rows.Count > 0) DelSameRecord(samematerialiddt);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                var a = ex.Message;
                 result = false;
             }
 
