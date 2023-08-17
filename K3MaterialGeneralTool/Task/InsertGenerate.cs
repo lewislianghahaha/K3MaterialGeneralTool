@@ -337,7 +337,7 @@ namespace K3MaterialGeneralTool.Task
             for (var i = 0; i < 2; i++)
             {
                 //获取‘单位换算’新主键值
-                var unitid = search.MakeDtidKey(13);
+                var unitid = search.MakeDtidKey(12);
 
                 //将‘物料编码’截图前8位+{{{{{0}}}结合
                 //添加判断‘excel物料编码’长度,若小于8个,即不用截取
@@ -410,6 +410,8 @@ namespace K3MaterialGeneralTool.Task
             var result = true;
             //定义K3列名
             var k3Colname = string.Empty;
+            //定义新主键值
+            var keyid = 0;
             DataRow[] xuanrows;
 
             try
@@ -426,7 +428,12 @@ namespace K3MaterialGeneralTool.Task
                 for (var i = 0; i < mdt.Rows.Count; i++)
                 {
                     //根据循环的tabid值获取对应K3表的KEY主键值
-                    var keyid = search.MakeDtidKey(tabid);
+                    //todo:change date->若tabid=12(T_BD_MATERIAL_P),即不用获取NEW KEY,因为T_BD_MATERIAL_P的主键为FMATERIALID
+                    if (tabid < 12)
+                    {
+                       keyid = search.MakeDtidKey(tabid);
+                    }
+
                     //若tabid值为0，即获取的KEY值为newfmaterialid
                     if (tabid == 0) _newmaterialid = keyid;
 
@@ -451,7 +458,17 @@ namespace K3MaterialGeneralTool.Task
                                     continue;
                             }
                         }
-                        else if(dtname != "T_BD_MATERIAL")
+                        //todo:change date 20230817 
+                        else if (dtname == "T_BD_MATERIAL_P")
+                        {
+                            switch (j)
+                            {
+                                case 0:
+                                    newrow[j] = _newmaterialid;
+                                    break;    
+                            }
+                        }
+                        else if(dtname != "T_BD_MATERIAL" && dtname!= "T_BD_MATERIAL_P")
                         {
                             switch (j)
                             {
@@ -467,11 +484,6 @@ namespace K3MaterialGeneralTool.Task
                         //使用k3Colname及k3Tablename查询是否有绑定关系;若有就获取对应的值;若没有将使用旧记录赋值给对应的项内
                         //根据k3Colname及k3Tablename查在bindt内找出对应的‘Excel字段名称’
                         var dtlrows = binddt.Select("K3列名='" + k3Colname + "' and K3表名='" + dtname + "'");
-
-                        //if (k3Colname == "F_YTC_ASSISTANT10")
-                        //{
-                        //    var a = 1;
-                        //}
 
                         if (dtlrows.Length > 0)
                         {
