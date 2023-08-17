@@ -176,8 +176,8 @@ namespace K3MaterialGeneralTool.Task
                     var exceltempdt = ImportExcelTempdt(rows);
 
                     //若找到oldmaterialid相关值,即获取关于此oldmaterialid的相关表格信息
-                    //循环从0~11;分别针对不同表进行生成KEY 插入内容等相关操作
-                    for (var i = 0; i < 12; i++)
+                    //循环从0~12;分别针对不同表进行生成KEY 插入内容等相关操作
+                    for (var i = 0; i < 13; i++)
                     {
                         //根据循环的i值及oldmaterialid获取数据源
                         var materialdt = search.Get_SearchMaterialSourceAndCreateTemp(i, oldmaterialid);
@@ -187,11 +187,11 @@ namespace K3MaterialGeneralTool.Task
 
                         //根据materialdt动态生成对应表格的临时表
                         var tempdt = materialdt.Clone();
-   
+
                         #region 根据循环id获取对应表信息
-                            //0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale
-                            //5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
-                            //10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY
+                        //0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale
+                        //5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
+                        //10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_MATERIAL_P
                         switch (i)
                         {
                             case 0:
@@ -229,6 +229,9 @@ namespace K3MaterialGeneralTool.Task
                                 break;
                             case 11:
                                 dtname = "T_BD_MATERIALQUALITY";
+                                break;
+                            case 12:
+                                dtname = "T_BD_MATERIAL_P";
                                 break;
                         }
                         #endregion
@@ -334,7 +337,7 @@ namespace K3MaterialGeneralTool.Task
             for (var i = 0; i < 2; i++)
             {
                 //获取‘单位换算’新主键值
-                var unitid = search.MakeDtidKey(12);
+                var unitid = search.MakeDtidKey(13);
 
                 //将‘物料编码’截图前8位+{{{{{0}}}结合
                 //添加判断‘excel物料编码’长度,若小于8个,即不用截取

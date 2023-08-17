@@ -699,7 +699,8 @@
         /// </summary>
         /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
         ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
-        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_UNITCONVERTRATE</param>
+        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_MATERIAL_P
+        ///                      13:T_BD_UNITCONVERTRATE</param>
         /// <param name="fmaterialid"></param>
         /// <returns></returns>
         public string Get_SearchMaterialSource(int typeid,int fmaterialid)
@@ -727,15 +728,17 @@
                                    F_YTC_TEXT12,F_YTC_TEXT13,
                                    F_YTC_TEXT14,F_YTC_TEXT15,F_YTC_TEXT16,F_YTC_TEXT17,F_YTC_DECIMAL10,F_YTC_CHECKBOX,F_YTC_TEXT18,F_YTC_TEXT19
                                   ,F_YTC_ASSISTANT10,F_ytc_Text20,F_YTC_TEXT21,F_YTC_ASSISTANT12
+                                  ,FREFSTATUS,FIsAutoAllocate,FSPUID,FPinYin,F_XNQL_TEXT
                             FROM dbo.T_BD_MATERIAL
                             WHERE FMATERIALID='{fmaterialid}'
                         ";
                     break;
                 //T_BD_MATERIAL_L
                 case 1:
-                    _result = $@"
+                        _result = $@"
                             SELECT A.FPKID ,A.FMATERIALID ,A.FLOCALEID ,A.FNAME ,A.FSPECIFICATION ,
-                                   A.FDESCRIPTION 
+                                   A.FDESCRIPTION,FUSEORGID,FFORBIDREASON
+                                  ,A.FUSEORGID,A.FFORBIDREASON
                             FROM dbo.T_BD_MATERIAL_L A
                             INNER JOIN T_BD_MATERIAL B ON A.FMATERIALID = B.FMATERIALID 
                             WHERE B.FMATERIALID='{fmaterialid}'
@@ -750,7 +753,9 @@
                                            A.FISREALTIMEACCOUT ,A.FTAXTYPE ,A.FTYPEID ,A.FTAXRATEID ,
                                            A.FISVMIBUSINESS ,A.FGROSSWEIGHT ,A.FNETWEIGHT ,A.FWEIGHTUNITID ,
                                            A.FLENGTH ,A.FWIDTH ,A.FHEIGHT,A.FVOLUME ,A.FVOLUMEUNITID ,
-                                           A.FBARCODE ,A.FCONFIGTYPE 
+                                           A.FBARCODE ,A.FCONFIGTYPE
+                                          ,A.FSUITE,A.FCOSTPRICERATE,A.FFEATUREITEM,A.FUSEORGID,A.FISCHANGE,A.FNameEn
+                                          ,A.FSysModel,A.FColor,A.FSpreadName,A.FMAKEINVOICEPARTY
                                     FROM dbo.T_BD_MATERIALBASE A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
@@ -770,7 +775,8 @@
                                         A.FSNUNIT ,A.FSNMANAGETYPE ,A.FISAUTOCREATEDCSN ,A.FSNCREATETIME ,
                                         A.FSAFESTOCK ,A.FREORDERGOOD ,A.FMINSTOCK ,A.FMAXSTOCK ,
                                         A.FUNITCONVERTDIR ,A.FISENABLEMINSTOCK ,A.FISENABLESAFESTOCK ,A.FISENABLEREORDER ,
-                                        A.FISENABLEMAXSTOCK ,A.FECONREORDERQTY ,A.FISSNPRDTRACY 
+                                        A.FISENABLEMAXSTOCK ,A.FECONREORDERQTY ,A.FISSNPRDTRACY
+                                        ,A.FBOXSTANDARDQTY,A.FUSEORGID,A.FCollectType
                                 FROM dbo.T_BD_MATERIALSTOCK A
                                 INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                 WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
@@ -787,6 +793,7 @@
                                            A.FAGENTSALREDUCERATE ,A.FALLOWPUBLISH ,A.FGOODSTYPEID ,A.FISAFTERSALE ,
                                            A.FISPRODUCTFILES ,A.FISWARRANTED ,A.FWARRANTYUNITID ,A.FWARRANTY ,
                                            A.FOUTLMTUNIT ,A.FTAXCATEGORYCODEID 
+                                           ,A.FISTAXENJOY,A.FTAXDISCOUNTSTYPE,A.FSALGROUP,A.FUSEORGID,A.FUNVALIDATEEXPQTY
                                     FROM dbo.T_BD_MATERIALSALE A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
@@ -804,6 +811,7 @@
                                            A.FMINSPLITQTY ,A.FAGENTPURPLUSRATE ,A.FCHARGEID ,A.FISLIMITPRICE ,
                                            A.FBASEMINSPLITQTY ,A.FISVMIBUSINESS ,A.FISRETURNMATERIAL ,A.FENABLESL ,
                                            A.FPURCHASEORGID ,A.FDEFBARCODERULEID ,A.FMINPACKCOUNT ,A.FPRINTCOUNT
+                                           ,A.FPOBILLTYPEID,A.FUSEORGID,A.FDAILYOUTQTYSUB,A.FDEFAULTLINEIDSUB,A.FISENABLESCHEDULESUB
                                     FROM dbo.T_BD_MATERIALPURCHASE A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
@@ -822,6 +830,8 @@
                                            A.FDELAYEXTENDDAY ,A.FPLANOFFSETTIMETYPE ,A.FPLANOFFSETTIME ,A.FPLANGROUPID ,
                                            A.FTIMEFACTORID ,A.FQTYFACTORID ,A.FSUPPLYSOURCEID ,A.FMFGPOLICYID ,
                                            A.FPLANMODE ,A.FALLOWPARTAHEAD ,A.FALLOWPARTDELAY ,A.FPLANSAFESTOCKQTY 
+                                           ,A.FATOSCHEMEID,A.FACCULEADTIME,A.FPRODUCTLINE,A.FWRITEOFFQTY
+                                           ,A.FPLANIDENT,A.FPROSCHETRACKID,A.FDAILYOUTQTY,A.FISMRPCOMBILL,A.FUSEORGID
                                     FROM dbo.T_BD_MATERIALPLAN A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
@@ -838,7 +848,9 @@
                                            A.FBOMURNUM ,A.FBOMURNOM ,A.FISCOMPLETESET ,A.FOVERCONTROLMODE ,A.FMINISSUEQTY ,
                                            A.FSTDLABORPREPARETIME ,A.FSTDLABORPROCESSTIME ,A.FSTDMACHINEPREPARETIME ,A.FSTDMACHINEPROCESSTIME ,
                                            A.FCONSUMVOLATITITY ,A.FISPRODUCTLINE ,A.FPRODUCEBILLTYPE ,A.FORGTRUSTBILLTYPE ,A.FISMINISSUEQTY ,
-                                           A.FISECN ,A.FMINISSUEUNITID ,A.FMDLID ,A.FMDLMATERIALID 
+                                           A.FISECN ,A.FMINISSUEUNITID ,A.FMDLID ,A.FMDLMATERIALID
+                                           ,A.FISSNCARRYTOPARENT,A.FSTANDHOURUNITID,A.FBACKFLUSHTYPE,A.FUSEORGID,A.FDEFAULTLINEID
+                                           ,A.FISENABLESCHEDULE
                                     FROM dbo.T_BD_MATERIALPRODUCE A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
@@ -849,7 +861,8 @@
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FAUXPROPERTYID ,A.FISENABLE ,
                                            A.FISCOMCONTROL ,A.FISMUSTINPUT ,A.FISAFFECTPRICE ,A.FISAFFECTPLAN ,
-                                           A.FISAFFECTCOST ,A.FVALUETYPE ,A.FVALUESET 
+                                           A.FISAFFECTCOST ,A.FVALUETYPE ,A.FVALUESET
+                                          ,A.FMASTERID,A.FUSEORGID
                                     FROM dbo.T_BD_MATERIALAUXPTY A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
@@ -859,7 +872,8 @@
                 case 9:
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FINVPTYID ,A.FISENABLE ,
-                                           A.FISAFFECTPRICE ,A.FISAFFECTPLAN ,A.FISAFFECTCOST 
+                                           A.FISAFFECTPRICE ,A.FISAFFECTPLAN ,A.FISAFFECTCOST
+                                           ,A.FUSEORGID
                                     FROM  dbo.T_BD_MATERIALINVPTY A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
@@ -870,7 +884,8 @@
                     _result = $@"
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FSUBCONUNITID ,A.FSUBCONPRICEUNITID ,
                                            A.FSUBCONURNUM ,A.FSUBCONURNOM ,A.FSUBCONPRICEURNUM ,
-                                           A.FSUBCONPRICEURNOM ,A.FSUBBILLTYPE 
+                                           A.FSUBCONPRICEURNOM ,A.FSUBBILLTYPE
+                                          ,A.FUSEORGID
                                     FROM dbo.T_BD_MATERIALSUBCON A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}';
@@ -882,15 +897,24 @@
                                     SELECT A.FENTRYID ,A.FMATERIALID ,A.FCHECKPRODUCT ,
                                            A.FCHECKINCOMING ,A.FINCSAMPSCHEMEID ,A.FINCQCSCHEMEID ,A.FCHECKSTOCK ,
                                            A.FENABLECYCLISTQCSTK ,A.FSTOCKCYCLE ,A.FENABLECYCLISTQCSTKEW ,
-                                           A.FEWLEADDAY ,A.FCHECKRETURN ,A.FCHECKDELIVERY ,A.FINSPECTGROUPID ,
-                                           A.FINSPECTORID
+                                           A.FEWLEADDAY ,A.FCHECKRETURN ,A.FCHECKDELIVERY ,A.FINSPECTGROUPID ,A.FINSPECTORID
+                                           ,A.FCHECKENTRUSTED,A.FCHECKOTHER,A.FISFIRSTINSPECT,A.FCHECKRETURNMTRL
+                                           ,A.FUSEORGID,A.FFIRSTQCCONTROLTYPE,A.FCHECKSUBRTNMTRL
                                     FROM dbo.T_BD_MATERIALQUALITY A
                                     INNER JOIN T_BD_MATERIAL ON A.FMATERIALID = T_BD_MATERIAL.FMATERIALID 
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
-                //T_BD_UNITCONVERTRATE
+                //T_BD_MATERIAL_P CHANGE DATE:20230814 新插入表(注:不影响此表会影响MRP运算)
                 case 12:
+                    _result = $@"
+                                     SELECT A.FMATERIALID,A.FDSMATCHBYLOT,A.FISHANDLERESERVE
+                                     FROM dbo.T_BD_MATERIAL_P A
+                                     WHERE A.FMATERIALID='{fmaterialid}'
+                                ";
+                    break;
+                //T_BD_UNITCONVERTRATE
+                case 13:
                     _result = $@"
                                     SELECT FUNITCONVERTRATEID , FMASTERID ,FBILLNO ,
                                            FFORMID ,FMATERIALID ,FCURRENTUNITID ,
