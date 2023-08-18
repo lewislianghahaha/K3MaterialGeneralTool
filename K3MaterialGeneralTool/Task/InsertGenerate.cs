@@ -236,12 +236,6 @@ namespace K3MaterialGeneralTool.Task
                         }
                         #endregion
 
-                        ////当dtname="T_BD_MATERIALSALE"时,获取materialdt.rows[0][2]的值并赋给salesunit变量;‘单位换算’表使用
-                        //if (dtname == "t_BD_MaterialSale")
-                        //{
-                        //    _salesunit = Convert.ToInt32(materialdt.Rows[0][2]);
-                        //}
-
                         //将materialdt tempdt keyid放至方法内进行选择插入,并返回bool,若为false,即跳转至CreateGenerateRecord()并break(跳出所有循环),loopmark为false
                         if (!MakeRecordToDb(i,materialdt, tempdt, exceltempdt, dtname, binddt))
                         {
@@ -330,8 +324,9 @@ namespace K3MaterialGeneralTool.Task
         {
             var materialcode = string.Empty;
             var fenzi = new decimal();
+
             //获取‘单位换算’临时表
-            var tempdt = tempDtList.CreateK3ImportTempDt(12);
+            var tempdt = tempDtList.CreateK3ImportTempDt(13);
 
             //循环将相关值插入至临时表(固定插入两行)
             for (var i = 0; i < 2; i++)
@@ -391,6 +386,9 @@ namespace K3MaterialGeneralTool.Task
 
                 tempdt.Rows.Add(newrow);
             }
+
+            //var a = tempdt.Copy();
+
             //最后将记录插入至T_BD_UNITCONVERTRATE数据表内
             ImportDtToDb(0,"T_BD_UNITCONVERTRATE", tempdt);
         }
@@ -439,6 +437,7 @@ namespace K3MaterialGeneralTool.Task
 
                     //对tempdt创建行,注:因为mdt与tempdt数据结构一致,故列也是一致
                     var newrow = tempdt.NewRow();
+
                     //循环mdt数据源-列
                     for (var j = 0; j < mdt.Columns.Count; j++)
                     {
@@ -465,10 +464,10 @@ namespace K3MaterialGeneralTool.Task
                             {
                                 case 0:
                                     newrow[j] = _newmaterialid;
-                                    break;    
+                                    continue;    
                             }
                         }
-                        else if(dtname != "T_BD_MATERIAL" && dtname!= "T_BD_MATERIAL_P")
+                        else if(dtname != "T_BD_MATERIAL")
                         {
                             switch (j)
                             {
@@ -683,8 +682,34 @@ namespace K3MaterialGeneralTool.Task
                                     {
                                         newrow[j] = Convert.ToString(exceltempdt.Rows[0][32]);
                                     }
+                                    //todo:change date:20230818 添加'F_XNQL_TEXT' 数据设置
+                                    else if (dtname == "T_BD_MATERIAL" && j == 92)
+                                    {
+                                        newrow[j] = "";
+                                    }
+                                    //todo:chanage date:20230818 T_BD_MATERIALBASE 对“FNameEn”(32) "FSysModel"(33) "FColor"(34) "FSpreadName"(35) 数据设置
+                                    else if (dtname == "t_BD_MaterialBase" && j == 32 || dtname == "t_BD_MaterialBase" && j == 33 ||
+                                             dtname == "t_BD_MaterialBase" && j == 34 || dtname == "t_BD_MaterialBase" && j == 35)
+                                    {
+                                        newrow[j] = "";
+                                    }
+                                    //todo: chanage date:20230818 T_BD_MATERIALBASE 对“FMAKEINVOICEPARTY”(36)
+                                    else if (dtname == "t_BD_MaterialBase" && j == 36)
+                                    {
+                                        newrow[j] = 0;
+                                    }
+                                    //todo:chanage date:20230818 T_BD_MATERIALSTOCK 对“FCollectType”数据设置
+                                    else if (dtname == "t_BD_MaterialStock" && j == 49)
+                                    {
+                                        newrow[j] = "";
+                                    }
+                                    //todo:change date:20230818 对 T_BD_MATERIAL_P 表进行赋值
+                                    else if (dtname == "T_BD_MATERIAL_P" && j==1)
+                                    {
+                                        newrow[j] = 0;
+                                    }
 
-                                    //若为空的值就根据指定字段设置为 "" 或 0
+                                    //若为空的值就根据指定字段设置为 "" 或 0 
                                     else
                                     {
                                         if (mdt.Rows[i][j].ToString() == "")

@@ -738,7 +738,7 @@
                 case 1:
                         _result = $@"
                             SELECT A.FPKID ,A.FMATERIALID ,A.FLOCALEID ,A.FNAME ,A.FSPECIFICATION ,
-                                   A.FDESCRIPTION,FUSEORGID,FFORBIDREASON
+                                   A.FDESCRIPTION
                                   ,A.FUSEORGID,A.FFORBIDREASON
                             FROM dbo.T_BD_MATERIAL_L A
                             INNER JOIN T_BD_MATERIAL B ON A.FMATERIALID = B.FMATERIALID 
