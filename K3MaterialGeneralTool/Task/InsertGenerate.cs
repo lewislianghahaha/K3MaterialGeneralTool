@@ -708,6 +708,11 @@ namespace K3MaterialGeneralTool.Task
                                     {
                                         newrow[j] = 0;
                                     }
+                                    //todo:change date:20230915 对‘U订货商品分类编码’F_YTC_TEXT9 [56] 以及 ‘U订货SKU码’[60]F_YTC_TEXT7 进行清空
+                                    else if (dtname == "T_BD_MATERIAL" && j == 56 || dtname== "T_BD_MATERIAL" && j==60)
+                                    {
+                                        newrow[j] = "";
+                                    }
 
                                     //若为空的值就根据指定字段设置为 "" 或 0 
                                     else
