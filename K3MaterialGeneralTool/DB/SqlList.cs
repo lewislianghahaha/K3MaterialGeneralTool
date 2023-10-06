@@ -442,12 +442,12 @@
         }
 
         /// <summary>
-        /// 根据typeid获取各表的主键值(一共14个)
+        /// 根据typeid获取各表的主键值(一共15个)
         /// </summary>
         /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
         ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
-        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_UNITCONVERTRATE
-        ///                      13:T_MAT_ImportHistoryRecord_Key</param>
+        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_UNITCONVERTRATE 13:CMK_BD_MATERIAL
+        ///                      14:T_MAT_ImportHistoryRecord_Key</param>
         /// <returns></returns>
         public string Get_MakeDtidKey(int typeid)
         {
@@ -674,8 +674,25 @@
                             END
                        ";
                     break;
-                //T_MAT_ImportHistoryRecord_Key
+                //CMK_BD_MATERIAL
                 case 13:
+                    _result = @"
+                                  DECLARE
+	                               @id INT;
+                                  BEGIN
+	                                    INSERT INTO dbo.Z_CMK_BD_MATERIAL( Column1 )
+	                                    VALUES  (1)
+
+	                                    SELECT @id=Id FROM dbo.Z_CMK_BD_MATERIAL
+
+	                                    DELETE FROM dbo.Z_CMK_BD_MATERIAL
+
+	                                    SELECT @id
+                                  END
+                               ";
+                    break;
+                //T_MAT_ImportHistoryRecord_Key
+                case 14:
                     _result = @"
                             DECLARE
 	                            @id INT;
@@ -700,8 +717,8 @@
         /// </summary>
         /// <param name="typeid">类型标记;0:T_BD_MATERIAL 1:T_BD_MATERIAL_L 2:t_BD_MaterialBase 3:t_BD_MaterialStock 4:t_BD_MaterialSale 
         ///                      5:t_bd_MaterialPurchase 6:t_BD_MaterialPlan 7:t_BD_MaterialProduce 8:t_BD_MaterialAuxPty 9:t_BD_MaterialInvPty 
-        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_MATERIAL_P
-        ///                      13:T_BD_UNITCONVERTRATE</param>
+        ///                      10:t_bd_MaterialSubcon 11:T_BD_MATERIALQUALITY 12:T_BD_MATERIAL_P 13:CMK_BD_MATERIAL
+        ///                      14:T_BD_UNITCONVERTRATE</param>
         /// <param name="fmaterialid"></param>
         /// <returns></returns>
         public string Get_SearchMaterialSource(int typeid,int fmaterialid)
@@ -906,7 +923,7 @@
                                     WHERE T_BD_MATERIAL.FMATERIALID = '{fmaterialid}'
                                 ";
                     break;
-                //T_BD_MATERIAL_P CHANGE DATE:20230814 新插入表(注:不影响此表会影响MRP运算)
+                //T_BD_MATERIAL_P CHANGE DATE:20230814 新插入表(注:不对此表插入数据会影响MRP运算)
                 case 12:
                     _result = $@"
                                      SELECT A.FMATERIALID,A.FDSMATCHBYLOT,A.FISHANDLERESERVE
@@ -914,8 +931,24 @@
                                      WHERE A.FMATERIALID='{fmaterialid}'
                                 ";
                     break;
-                //T_BD_UNITCONVERTRATE
+                //CMK_BD_MATERIAL change date:20231006 新插入表(注:不对此表插入数据会导致多行审核时出现异常)
                 case 13:
+                    _result = $@"
+                                    SELECT A.FMATERIALID,A.FEntryId,A.FGOODSTYPE_CMK,A.FCOMTYPEID_CMK,A.FBARCODEHEADER_CMK,
+                                           A.FCOMBRANDID_CMK,A.FGOODBARCODE_CMK,A.FBusinessType_CMK,A.FSellMethod_CMK,
+                                           A.FCurrencyId_CMK,A.FSaleStatus_CMK,A.FPurStatus_CMK,A.FPurPrice_CMK,A.FSalePrice_CMK,
+                                           A.FVIPPrice_CMK,A.FProPrice,A.FIMGFILE_CMK,A.FSHOPPEID_CMK,A.FMaterialSource,A.FISFORINTERGRALPOLICY,
+                                           A.FPLANPRICE,A.FISAUTOREMOVE,A.FISCONTROLSAL,A.FLOWERPERCENT,A.FUPPERCENT,A.FCALCULATEBASE,
+                                           A.FMAXSALPRICE_CMK,A.FMINSALPRICE_CMK,A.FISFREESEND,A.FPRICETYPE,A.FLOGISTICSCOUNT,
+                                           A.FISMAILVIRTUAL,A.FISACCESSORY,A.FISPRINTTAG,A.FMinRequestQty,A.FRequestMinPackQty,A.FRetailUnitID,
+                                           A.FTIMEUNIT,A.FMINRENTDURA,A.FRENTBEGINPRICE,A.FPRICINGSTEP,A.FRENTFREEDURA,A.FRENTSTEPPRICE,
+                                           A.FDEPOSITAMOUNT,A.FPointsRate_CMK,A.FCMKMINDISCOUNTRATE,A.FUPLOADSKUIMAGE 
+                                    FROM dbo.CMK_BD_MATERIAL A
+                                    WHERE A.FMATERIALID='{fmaterialid}'
+                                ";
+                    break;
+                //T_BD_UNITCONVERTRATE
+                case 14:
                     _result = $@"
                                     SELECT FUNITCONVERTRATEID , FMASTERID ,FBILLNO ,
                                            FFORMID ,FMATERIALID ,FCURRENTUNITID ,

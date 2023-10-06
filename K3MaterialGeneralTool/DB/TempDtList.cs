@@ -342,7 +342,7 @@ namespace K3MaterialGeneralTool.DB
         /// <summary>
         /// 根据typeid动态生成对应的临时表(在生成T_BD_UNITCONVERTRATE时使用)
         /// </summary>
-        /// <param name="typeid">类型标记;13:T_BD_UNITCONVERTRATE</param>
+        /// <param name="typeid">类型标记;14:T_BD_UNITCONVERTRATE</param>
         /// <returns></returns>
         public DataTable CreateK3ImportTempDt(int typeid)
         {
