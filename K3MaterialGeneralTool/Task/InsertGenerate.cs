@@ -429,7 +429,7 @@ namespace K3MaterialGeneralTool.Task
                 for (var i = 0; i < mdt.Rows.Count; i++)
                 {
                     //根据循环的tabid值获取对应K3表的KEY主键值
-                    //todo:change date->若tabid=12(T_BD_MATERIAL_P),即不用获取NEW KEY,因为T_BD_MATERIAL_P的主键为FMATERIALID
+                    //todo:change date->若tabid=12(T_BD_MATERIAL_P),即不用获取NEW KEY,因为T_BD_MATERIAL_P的只有一个主键为FMATERIALID
                     //todo:change date:20231006-->修改为tabid!=12 时,才获取对应表的主键值
                     if (tabid != 12)
                     {
